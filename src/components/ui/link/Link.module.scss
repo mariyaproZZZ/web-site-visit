@@ -1,0 +1,28 @@
+.link {
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 700;
+  transition: all 0.3s ease;
+}
+
+.forgot {
+  font-size: 14px;
+  color: #2a3b1e;
+  padding-bottom: 2px;
+  border-bottom: 1px solid rgba(146, 205, 71, 0.3);
+  
+  &:hover {
+    border-bottom-color: #2a3b1e;
+  }
+}
+
+.footer {
+  font-size: 14px;
+  color: #1a2a0f;
+  padding: 5px 10px;
+  border-radius: 8px;
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+}

@@ -1,0 +1,42 @@
+.button {
+  cursor: pointer;
+  font-weight: 800;
+  transition: all 0.2s ease;
+  border: none;
+  
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.primary {
+  background: linear-gradient(to bottom, #e3f8c2 0%, #bce97f 45%, #92cd47 46%, #a9e05d 100%);
+  border: 1px solid #79aa32;
+  border-radius: 30px;
+  font-size: 18px;
+  color: #0e1e05;
+  box-shadow: 0 5px 12px rgba(146, 205, 71, 0.4);
+  padding: 11px 44px;
+  height: 55px;
+  width: 240px;
+  
+  &:hover {
+    transform: scale(1.02);
+    filter: brightness(1.1);
+  }
+}
+
+.close {
+  width: 120px;
+  height: 40px;
+  background: linear-gradient(to bottom, #d1f4ff, #87cefa);
+  border: 1px solid #5cb8ff;
+  border-radius: 20px;
+  font-size: 14px;
+  color: #003a6b;
+  
+  &:hover {
+    opacity: 0.9;
+    transform: scale(1.02);
+  }
+}

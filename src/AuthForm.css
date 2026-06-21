@@ -1,0 +1,278 @@
+/* ==========================================================================
+   1. СБРОС И ИЗОЛЯЦИЯ ОКНА (Убиваем любые внешние сдвиги в React-проекте)
+   ========================================================================== */
+html, body, #root {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 100vh !important;
+    overflow: hidden !important;
+    box-sizing: border-box;
+}
+
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
+/* ==========================================================================
+   2. ОСНОВНОЙ КОНТЕЙНЕР (Фиксируем на весь экран, выравниваем СТРОГО по центру)
+   ========================================================================== */
+.auth-container {
+    position: fixed; /* Абсолютная изоляция: теперь плевать на чужие стили */
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9999; /* Поверх всего */
+    
+    display: flex !important;
+    justify-content: center !important; /* Строго центр по горизонтали */
+    align-items: center !important;     /* Строго центр по вертикали */
+    
+    /* Твой Frutiger Aero фон */
+    background-image: url('./assets/aero-bg.png') !important; 
+    background-size: cover !important;       /* Растягиваем без черных полос */
+    background-position: center !important;  /* Центрируем картинку */
+    background-repeat: no-repeat !important;
+    
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+/* ==========================================================================
+   3. ГЛАВНАЯ ФОРМА (Идеальные пропорции "в струночку")
+   ========================================================================== */
+.auth-form {
+    width: 654px !important;
+    height: 691px !important;
+    max-width: 654px;
+    max-height: 691px;
+    
+    /* Полупрозрачность и матовое стекло */
+    background-color: rgba(255, 255, 255, 0.55) !important; 
+    backdrop-filter: blur(20px) !important; 
+    -webkit-backdrop-filter: blur(20px) !important;
+    
+    border-radius: 30px !important;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15) !important; 
+    
+    display: flex !important;
+    flex-direction: column !important;
+    position: relative !important;
+    overflow: hidden !important;
+    
+    /* Обнуляем внешние сдвиги */
+    margin: 0 !important; 
+    padding: 0 !important;
+}
+
+/* ==========================================================================
+   4. ВНУТРЕННИЕ СТРУКТУРЫ (Фиксируем по сетке)
+   ========================================================================== */
+
+/* Шапка формы */
+.auth-header {
+    height: 210px !important;
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 0 40px !important;
+    width: 100% !important;
+}
+
+.auth-title {
+    font-size: 24px !important;
+    color: #171717 !important;
+    font-weight: 900 !important;
+    line-height: 1.2 !important;
+}
+
+/* Иконка и её свечение */
+.auth-logo-wrapper {
+    width: 134px !important;
+    height: 134px !important;
+    border-radius: 50% !important;
+    background: radial-gradient(circle, rgba(204,230,171,1) 0%, rgba(204,230,171,0.5) 45%, rgba(255,255,255,0) 70%) !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+.auth-logo {
+    width: 134px !important;
+    height: 134px !important;
+    object-fit: contain !important;
+}
+
+/* Тело формы */
+.auth-body {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    width: 100% !important;
+    padding: 0 40px !important;
+}
+
+/* Роль */
+.auth-subtitle {
+    font-size: 20px !important;
+    color: #444444 !important;
+    margin-bottom: 20px !important;
+    height: 35px !important;
+    line-height: 35px !important;
+    text-align: center !important;
+    font-weight: 500 !important;
+}
+
+/* Контейнеры полей (СТРОГО "в струночку") */
+.input-group {
+    width: 574px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+    margin-bottom: 16px !important;
+}
+
+.input-label {
+    font-size: 16px !important;
+    color: #171717 !important;
+    font-weight: 600 !important;
+    align-self: flex-start !important;
+}
+
+/* Поля ввода — СТРОГО 574px на 53px */
+.auth-input {
+    width: 574px !important;
+    height: 53px !important;
+    background-color: rgba(255, 255, 255, 0.85) !important;
+    border: 1px solid #D1D5DB !important;
+    border-radius: 12px !important;
+    padding: 16px 24px !important;
+    font-size: 16px !important;
+    color: #000000 !important;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05) !important;
+    outline: none !important;
+}
+
+/* Ссылка "Забыли пароль?" справа */
+.auth-meta {
+    width: 574px !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+    margin-top: -8px !important;
+    margin-bottom: 24px !important;
+}
+
+.auth-forgot {
+    font-size: 14px !important;
+    color: #444444 !important;
+    text-decoration: none !important;
+}
+
+/* Кнопка и действия */
+.auth-actions {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 16px !important;
+    width: 574px !important;
+}
+
+.auth-btn {
+    width: 169px !important;
+    height: 63px !important;
+    background-color: #CCE6AB !important;
+    border: none !important;
+    border-radius: 20px !important;
+    font-size: 18px !important;
+    color: #171717 !important;
+    font-weight: bold !important;
+    cursor: pointer !important;
+    box-shadow: 0 4px 12px rgba(204, 230, 171, 0.4) !important;
+}
+
+.auth-role-toggle {
+    font-size: 14px !important;
+    color: #444444 !important;
+    text-decoration: underline !important;
+    cursor: pointer !important;
+    font-weight: 500 !important;
+}
+
+/* Нижняя панель внутри формы */
+.auth-footer {
+    width: 654px !important;
+    height: 44px !important;
+    background-color: rgba(204, 230, 171, 0.85) !important;
+    display: flex !important;
+    justify-content: space-around !important;
+    align-items: center !important;
+    position: absolute !important;
+    bottom: 0 !important;
+    left: 0 !important;
+}
+
+.footer-link {
+    font-size: 14px !important;
+    color: #171717 !important;
+    text-decoration: none !important;
+    font-weight: 600 !important;
+}
+
+.auth-form {
+    /* ... остальные твои стили формы ... */
+
+    /* УСИЛЕННЫЙ БЛЮР (МАТОВОЕ СТЕКЛО СТАЛО ЕЩЕ РАСПЛЫВЧАТЕЕ) */
+    backdrop-filter: blur(80px) !important; 
+    -webkit-backdrop-filter: blur(80px) !important;
+
+    /* ... остальные твои стили формы ... */
+}
+
+/* ЭФФЕКТ ПОДСВЕТКИ ПОЛЯ ПРИ КЛИКЕ (НАЖАТИИ) */
+.auth-input:focus {
+    outline: none !important; /* Убираем стандартную обводку браузера */
+    border-color: #CCE6AB !important; /* Делаем границу нежно-зеленой */
+    background-color: #FFFFFF !important; /* При клике поле становится чисто белым */
+    
+    /* Сочное неоновое свечение (справа, слева, внутри) */
+    box-shadow: 0 0 15px rgba(204, 230, 171, 1), 
+                inset 0 1px 3px rgba(0, 0, 0, 0.1) !important; 
+    
+    transition: all 0.2s ease-in-out; /* Чтобы свечение появлялось плавно */
+}
+
+/* Кнопка ВОЙТИ в обычном состоянии */
+.auth-btn {
+    width: 169px !important;
+    height: 63px !important;
+    background-color: #CCE6AB !important;
+    border: none !important;
+    border-radius: 20px !important;
+    font-size: 18px !important;
+    color: #171717 !important;
+    font-weight: bold !important;
+    cursor: pointer !important;
+    box-shadow: 0 4px 12px rgba(204, 230, 171, 0.4) !important;
+    
+    /* ВАЖНО: Анимация плавного перехода (0.2 секунды) для ВСЕХ изменений */
+    transition: all 0.2s ease-in-out !important; 
+}
+
+/* ЭФФЕКТ ПРИ НАВЕДЕНИИ КУРСОРA (HOVER) */
+.auth-btn:hover {
+    /* Увеличиваем кнопку на 5% */
+    transform: scale(1.05) !important; 
+    
+    /* Делаем тень чуть-чуть глубже и ярче при наведении, чтобы кнопка «приподнималась» */
+    box-shadow: 0 6px 20px rgba(204, 230, 171, 0.6) !important; 
+    
+    /* Слегка делаем цвет сочнее (по желанию, можно оставить прежним) */
+    background-color: #bfe097 !important; 
+}
+
+/* ЭФФЕКТ ПРИ НАЖАТИИ (CLICK) */
+.auth-btn:active {
+    /* При самом клике кнопка слегка уменьшается обратно, создавая эффект продавливания */
+    transform: scale(0.98) !important; 
+}

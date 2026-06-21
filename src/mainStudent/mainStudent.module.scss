@@ -1,0 +1,21 @@
+.studentContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(135deg, #e0f2fe 0%, #f0fdf4 100%);
+  font-family: sans-serif;
+}
+
+.welcomeTitle {
+  font-size: 32px;
+  color: #1e293b;
+  margin-bottom: 10px;
+}
+
+.description {
+  font-size: 18px;
+  color: #64748b;
+}

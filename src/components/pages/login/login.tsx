@@ -9,9 +9,15 @@ import { Link } from '../../ui/link/Link';
 import { Footer } from '../../ui/footer/Footer';
 import { Modal } from '../../ui/modal/Modal';
 
+// Временная функция setAuth (пока не работает импорт)
+const setAuth = (user: { login: string; role: 'student' | 'teacher' }) => {
+  localStorage.setItem('user', JSON.stringify(user));
+};
+
 export const Login: React.FC = () => {
   const navigate = useNavigate();
   
+  // Состояния для формы
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -19,6 +25,7 @@ export const Login: React.FC = () => {
   const [showHint, setShowHint] = useState(false);
   const [activeModal, setActiveModal] = useState<string | null>(null);
 
+  // Автоматическое скрытие модального окна через 5 секунд
   useEffect(() => {
     if (activeModal) {
       const timer = setTimeout(() => {
@@ -26,15 +33,20 @@ export const Login: React.FC = () => {
       }, 5000);
       return () => clearTimeout(timer);
     }
+    return undefined;
   }, [activeModal]);
 
+  // Обработчик отправки формы
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
+    // Проверка логина и пароля
     if (login === '1' && password === '1') {
+      setAuth({ login, role: 'student' });
       navigate('/student');
     } else if (login === '2' && password === '2') {
+      setAuth({ login, role: 'teacher' });
       navigate('/teacher');
     } else {
       setError('Неверные данные');
@@ -76,6 +88,7 @@ export const Login: React.FC = () => {
         <div className={styles.authBody}>
           <Title level={2}>Вход в систему</Title>
           
+          {/* Сообщение об ошибке */}
           {error && (
             <div className={styles.errorMessage}>
               {error}

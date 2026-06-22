@@ -202,3 +202,24 @@
   width: 100%;
   margin-top: 20px;
 }
+
+/* --- СООБЩЕНИЕ ОБ ОШИБКЕ --- */
+.errorMessage {
+  width: 100%;
+  padding: 10px 15px;
+  margin-bottom: 15px;
+  background: rgba(255, 0, 0, 0.1);
+  border: 1px solid rgba(255, 0, 0, 0.3);
+  border-radius: 12px;
+  color: #d32f2f;
+  font-weight: 600;
+  font-size: 14px;
+  text-align: center;
+  animation: shake 0.5s ease-in-out;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
+}

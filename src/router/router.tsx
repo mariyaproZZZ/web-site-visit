@@ -2,13 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Login } from '../components/pages/login/login';
 import { MainStudent } from '../mainStudent/mainStudent';
-
-// Временный пустой компонент для страницы преподавателя, чтобы не было ошибок
-const MainTeacher = () => (
-  <div style={{ padding: '20px', color: '#fff', textAlign: 'center' }}>
-    <h2>Главная страница преподавателя (В разработке)</h2>
-  </div>
-);
+import { MainTeacher } from '../mainTeacher/mainTeacher';
 
 export const AppRouter: React.FC = () => {
   return (

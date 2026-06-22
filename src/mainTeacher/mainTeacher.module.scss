@@ -1,0 +1,21 @@
+.teacherContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(135deg, #fef3c7 0%, #fef9e7 100%);
+    font-family: 'Nunito', sans-serif;
+  }
+  
+  .welcomeTitle {
+    font-size: 32px;
+    color: #1e293b;
+    margin-bottom: 10px;
+  }
+  
+  .description {
+    font-size: 18px;
+    color: #64748b;
+  }

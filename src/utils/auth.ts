@@ -1,39 +1,34 @@
-// src/utils/auth.ts
+import type { User, UserRole } from '../types/user';
 
-// Тип для пользователя
-interface User {
-  login: string;
-  role: 'student' | 'teacher';
-}
+const TOKEN_KEY = 'token';
+const USER_KEY = 'user';
 
-// Сохранение данных пользователя
-export const setAuth = (user: User): void => {
-  localStorage.setItem('user', JSON.stringify(user));
+export type { User, UserRole };
+
+export const setAuth = (user: User, token: string) => {
+  localStorage.setItem(TOKEN_KEY, token);
+  localStorage.setItem(USER_KEY, JSON.stringify(user));
 };
 
-// Получение данных пользователя
-export const getAuth = (): User | null => {
-  const user = localStorage.getItem('user');
-  if (!user) return null;
+export const getToken = (): string | null => localStorage.getItem(TOKEN_KEY);
+
+export const getUser = (): User | null => {
+  const data = localStorage.getItem(USER_KEY);
+  if (!data) {
+    return null;
+  }
   try {
-    return JSON.parse(user);
+    return JSON.parse(data) as User;
   } catch {
     return null;
   }
 };
 
-// Выход из системы (удаление данных)
-export const logout = (): void => {
-  localStorage.removeItem('user');
-};
+export const getUserRole = (): UserRole | null => getUser()?.role ?? null;
 
-// Проверка авторизации
-export const isAuthenticated = (): boolean => {
-  return localStorage.getItem('user') !== null;
-};
+export const isAuthenticated = (): boolean => getToken() !== null;
 
-// Получение роли пользователя
-export const getUserRole = (): 'student' | 'teacher' | null => {
-  const user = getAuth();
-  return user ? user.role : null;
+export const logout = () => {
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(USER_KEY);
 };

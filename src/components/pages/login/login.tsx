@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { authenticateUser, generateToken } from '../../../services/authService';
+import { setAuth } from '../../../utils/auth';
 import styles from './login.module.scss';
 import { Title } from '../../ui/title/Title';
 import { Logo } from '../../ui/logo/Logo';
@@ -9,50 +11,36 @@ import { Link } from '../../ui/link/Link';
 import { Footer } from '../../ui/footer/Footer';
 import { Modal } from '../../ui/modal/Modal';
 
-// Временная функция setAuth (пока не работает импорт)
-const setAuth = (user: { login: string; role: 'student' | 'teacher' }) => {
-  localStorage.setItem('user', JSON.stringify(user));
-};
-
 export const Login: React.FC = () => {
   const navigate = useNavigate();
   
-  // Состояния для формы
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showHint, setShowHint] = useState(false);
   const [activeModal, setActiveModal] = useState<string | null>(null);
 
-  // Автоматическое скрытие модального окна через 5 секунд
-  useEffect(() => {
-    if (activeModal) {
-      const timer = setTimeout(() => {
-        setActiveModal(null);
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
-    return undefined;
-  }, [activeModal]);
-
-  // Обработчик отправки формы
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setLoading(true);
 
-    // Проверка логина и пароля
-    if (login === '1' && password === '1') {
-      setAuth({ login, role: 'student' });
-      navigate('/student');
-    } else if (login === '2' && password === '2') {
-      setAuth({ login, role: 'teacher' });
-      navigate('/teacher');
-    } else {
-      setError('Неверные данные');
-      setTimeout(() => {
-        setError('');
-      }, 3000);
+    try {
+      const user = await authenticateUser(login, password);
+
+      if (!user) {
+        setError('Неверный логин или пароль');
+        return;
+      }
+
+      setAuth(user, generateToken());
+      navigate(user.role === 'student' ? '/student' : '/teacher');
+    } catch {
+      setError('Не удалось подключиться к серверу. Запустите npm run dev');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -88,7 +76,6 @@ export const Login: React.FC = () => {
         <div className={styles.authBody}>
           <Title level={2}>Вход в систему</Title>
           
-          {/* Сообщение об ошибке */}
           {error && (
             <div className={styles.errorMessage}>
               {error}
@@ -146,8 +133,8 @@ export const Login: React.FC = () => {
             </div>
 
             <div className={styles.authActions}>
-              <Button variant="primary" type="submit">
-                Войти
+              <Button variant="primary" type="submit" disabled={loading}>
+                {loading ? 'Загрузка...' : 'Войти'}
               </Button>
             </div>
           </form>

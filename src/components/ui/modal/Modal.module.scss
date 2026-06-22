@@ -1,25 +1,100 @@
-.modal {
-  position: absolute;
-  bottom: 100px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 320px;
-  padding: 20px;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  z-index: 999999;
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   align-items: center;
-  gap: 12px;
+  animation: fadeIn 0.3s ease;
+  margin: 0;
+  padding: 0;
+}
+
+.modal {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 30px;
+  padding: 30px 35px;
+  max-width: 480px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  animation: slideUp 0.3s ease;
+  margin: 0 auto;
+}
+
+.modalTitle {
+  font-size: 22px;
+  font-weight: 800;
+  color: #1e293b;
+  margin: 0 0 20px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-right: 30px;
+}
+
+.modalTitle::before {
+  content: '';
+  width: 6px;
+  height: 24px;
+  background: #0A84FF;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.closeBtn {
+  position: absolute;
+  top: 18px;
+  right: 22px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: color 0.3s ease, transform 0.3s ease;
+  line-height: 1;
   z-index: 10;
-  animation: slideUp 0.4s ease-out forwards;
+}
+
+.closeBtn:hover {
+  color: #1e293b;
+  transform: rotate(90deg);
+}
+
+.modalContent {
+  color: #475569;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @keyframes slideUp {
-  from { opacity: 0; transform: translateY(20px) translateX(-50%); }
-  to { opacity: 1; transform: translateY(0) translateX(-50%); }
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (max-width: 480px) {
+  .modal {
+    padding: 20px 22px;
+    border-radius: 20px;
+  }
 }

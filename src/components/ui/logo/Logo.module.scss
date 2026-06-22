@@ -8,11 +8,12 @@
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.2);
   transition: all 0.4s ease;
-  
-  &:hover {
-    opacity: 0.8;
-    transform: scale(1.05);
-  }
+  flex-shrink: 0;
+}
+
+.logoWrapper:hover {
+  opacity: 0.8;
+  transform: scale(1.05);
 }
 
 .logo {

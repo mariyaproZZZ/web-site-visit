@@ -11,7 +11,7 @@
 React 18 • TypeScript • Vite • SCSS Modules
 
 ## 🔐 Тестовые данные
-- **Студент:** `student` / `student123`
+- **Студент:** `student1` / `student123`
 - **Преподаватель:** `teacher` / `teacher123`
 
 ## 🚀 Запуск

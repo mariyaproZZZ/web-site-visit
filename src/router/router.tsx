@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Login } from '../components/pages/login/login';
 import { MainStudent } from '../mainStudent/mainStudent';
 import { MainTeacher } from '../mainTeacher/mainTeacher';
+import { GroupAttendance } from '../groupAttendance/groupAttendance';
 import { isAuthenticated, getUserRole } from '../utils/auth';
 
 interface ProtectedRouteProps {
@@ -39,6 +40,14 @@ export const AppRouter: React.FC = () => {
           element={
             <ProtectedRoute role="teacher">
               <MainTeacher />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/teacher/group/:groupId"
+          element={
+            <ProtectedRoute role="teacher">
+              <GroupAttendance />
             </ProtectedRoute>
           }
         />

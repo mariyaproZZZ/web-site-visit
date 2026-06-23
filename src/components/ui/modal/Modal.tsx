@@ -7,6 +7,7 @@ interface ModalProps {
   children: React.ReactNode;
   title?: string;
   className?: string;
+  style?: React.CSSProperties;
 }
 
 export const Modal: React.FC<ModalProps> = ({
@@ -14,16 +15,18 @@ export const Modal: React.FC<ModalProps> = ({
   onClose,
   children,
   title,
-  className = ''
+  className = '',
+  style = {}
 }) => {
-  // Для диагностики
-  console.log('Modal render, isOpen:', isOpen);
-  
   if (!isOpen) return null;
 
   return (
     <div className={styles.overlay} onClick={onClose}>
-      <div className={`${styles.modal} ${className}`} onClick={(e) => e.stopPropagation()}>
+      <div 
+        className={`${styles.modal} ${className}`} 
+        style={style}
+        onClick={(e) => e.stopPropagation()}
+      >
         {title && <h2 className={styles.modalTitle}>{title}</h2>}
         <button className={styles.closeBtn} onClick={onClose}>✕</button>
         <div className={styles.modalContent}>

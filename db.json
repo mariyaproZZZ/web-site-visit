@@ -41,41 +41,286 @@
       "login": "student5",
       "password": "student123",
       "fullName": "Морозова Екатерина Алексеевна",
-      "groupId": 2
+      "groupId": 1
     },
     {
       "id": "6",
       "login": "student6",
       "password": "student123",
       "fullName": "Волков Андрей Сергеевич",
-      "groupId": 2
+      "groupId": 1
     },
     {
       "id": "7",
       "login": "student7",
       "password": "student123",
       "fullName": "Новикова Ольга Владимировна",
-      "groupId": 2
+      "groupId": 1
     },
     {
       "id": "8",
       "login": "student8",
       "password": "student123",
       "fullName": "Фёдоров Максим Иванович",
-      "groupId": 3
+      "groupId": 1
     },
     {
       "id": "9",
       "login": "student9",
       "password": "student123",
       "fullName": "Егорова Наталья Петровна",
-      "groupId": 3
+      "groupId": 1
     },
     {
       "id": "10",
       "login": "student10",
       "password": "student123",
       "fullName": "Алексеев Павел Константинович",
+      "groupId": 1
+    },
+    {
+      "id": "11",
+      "login": "student11",
+      "password": "student123",
+      "fullName": "Григорьева Мария Дмитриевна",
+      "groupId": 1
+    },
+    {
+      "id": "12",
+      "login": "student12",
+      "password": "student123",
+      "fullName": "Михайлов Сергей Алексеевич",
+      "groupId": 1
+    },
+    {
+      "id": "13",
+      "login": "student13",
+      "password": "student123",
+      "fullName": "Васильева Анна Игоревна",
+      "groupId": 1
+    },
+    {
+      "id": "14",
+      "login": "student14",
+      "password": "student123",
+      "fullName": "Степанов Владимир Николаевич",
+      "groupId": 1
+    },
+    {
+      "id": "15",
+      "login": "student15",
+      "password": "student123",
+      "fullName": "Николаева Елена Петровна",
+      "groupId": 1
+    },
+    {
+      "id": "16",
+      "login": "student16",
+      "password": "student123",
+      "fullName": "Захарова Кристина Андреевна",
+      "groupId": 2
+    },
+    {
+      "id": "17",
+      "login": "student17",
+      "password": "student123",
+      "fullName": "Тимофеев Илья Сергеевич",
+      "groupId": 2
+    },
+    {
+      "id": "18",
+      "login": "student18",
+      "password": "student123",
+      "fullName": "Андреева Дарья Максимовна",
+      "groupId": 2
+    },
+    {
+      "id": "19",
+      "login": "student19",
+      "password": "student123",
+      "fullName": "Крылов Артем Владимирович",
+      "groupId": 2
+    },
+    {
+      "id": "20",
+      "login": "student20",
+      "password": "student123",
+      "fullName": "Соколова Анастасия Дмитриевна",
+      "groupId": 2
+    },
+    {
+      "id": "21",
+      "login": "student21",
+      "password": "student123",
+      "fullName": "Белоусов Николай Алексеевич",
+      "groupId": 2
+    },
+    {
+      "id": "22",
+      "login": "student22",
+      "password": "student123",
+      "fullName": "Орлова Татьяна Игоревна",
+      "groupId": 2
+    },
+    {
+      "id": "23",
+      "login": "student23",
+      "password": "student123",
+      "fullName": "Медведев Алексей Петрович",
+      "groupId": 2
+    },
+    {
+      "id": "24",
+      "login": "student24",
+      "password": "student123",
+      "fullName": "Федотова Екатерина Николаевна",
+      "groupId": 2
+    },
+    {
+      "id": "25",
+      "login": "student25",
+      "password": "student123",
+      "fullName": "Гусев Михаил Андреевич",
+      "groupId": 2
+    },
+    {
+      "id": "26",
+      "login": "student26",
+      "password": "student123",
+      "fullName": "Шестакова Ольга Сергеевна",
+      "groupId": 2
+    },
+    {
+      "id": "27",
+      "login": "student27",
+      "password": "student123",
+      "fullName": "Денисов Павел Владимирович",
+      "groupId": 2
+    },
+    {
+      "id": "28",
+      "login": "student28",
+      "password": "student123",
+      "fullName": "Романова Мария Алексеевна",
+      "groupId": 2
+    },
+    {
+      "id": "29",
+      "login": "student29",
+      "password": "student123",
+      "fullName": "Андреев Сергей Игоревич",
+      "groupId": 2
+    },
+    {
+      "id": "30",
+      "login": "student30",
+      "password": "student123",
+      "fullName": "Павлова Алина Дмитриевна",
+      "groupId": 2
+    },
+    {
+      "id": "31",
+      "login": "student31",
+      "password": "student123",
+      "fullName": "Лебедев Дмитрий Сергеевич",
+      "groupId": 3
+    },
+    {
+      "id": "32",
+      "login": "student32",
+      "password": "student123",
+      "fullName": "Максимова Анна Владимировна",
+      "groupId": 3
+    },
+    {
+      "id": "33",
+      "login": "student33",
+      "password": "student123",
+      "fullName": "Кузьмина Екатерина Петровна",
+      "groupId": 3
+    },
+    {
+      "id": "34",
+      "login": "student34",
+      "password": "student123",
+      "fullName": "Баранов Артем Николаевич",
+      "groupId": 3
+    },
+    {
+      "id": "35",
+      "login": "student35",
+      "password": "student123",
+      "fullName": "Виноградова Ольга Алексеевна",
+      "groupId": 3
+    },
+    {
+      "id": "36",
+      "login": "student36",
+      "password": "student123",
+      "fullName": "Матвеев Иван Дмитриевич",
+      "groupId": 3
+    },
+    {
+      "id": "37",
+      "login": "student37",
+      "password": "student123",
+      "fullName": "Зайцева Наталья Игоревна",
+      "groupId": 3
+    },
+    {
+      "id": "38",
+      "login": "student38",
+      "password": "student123",
+      "fullName": "Беляев Сергей Александрович",
+      "groupId": 3
+    },
+    {
+      "id": "39",
+      "login": "student39",
+      "password": "student123",
+      "fullName": "Голубева Мария Владимировна",
+      "groupId": 3
+    },
+    {
+      "id": "40",
+      "login": "student40",
+      "password": "student123",
+      "fullName": "Яковлев Денис Сергеевич",
+      "groupId": 3
+    },
+    {
+      "id": "41",
+      "login": "student41",
+      "password": "student123",
+      "fullName": "Ершова Елена Николаевна",
+      "groupId": 3
+    },
+    {
+      "id": "42",
+      "login": "student42",
+      "password": "student123",
+      "fullName": "Гаврилов Алексей Петрович",
+      "groupId": 3
+    },
+    {
+      "id": "43",
+      "login": "student43",
+      "password": "student123",
+      "fullName": "Чернышева Татьяна Андреевна",
+      "groupId": 3
+    },
+    {
+      "id": "44",
+      "login": "student44",
+      "password": "student123",
+      "fullName": "Попов Владимир Сергеевич",
+      "groupId": 3
+    },
+    {
+      "id": "45",
+      "login": "student45",
+      "password": "student123",
+      "fullName": "Сергеева Екатерина Дмитриевна",
       "groupId": 3
     }
   ],
@@ -124,32 +369,77 @@
     },
     {
       "id": "6",
+      "name": "Компьютерные сети",
+      "groupId": 1
+    },
+    {
+      "id": "7",
+      "name": "Операционные системы",
+      "groupId": 1
+    },
+    {
+      "id": "8",
+      "name": "Веб-разработка",
+      "groupId": 1
+    },
+    {
+      "id": "9",
       "name": "Математический анализ",
       "groupId": 2
     },
     {
-      "id": "7",
+      "id": "10",
       "name": "Теория вероятностей",
       "groupId": 2
     },
     {
-      "id": "8",
+      "id": "11",
       "name": "Дискретная математика",
       "groupId": 2
     },
     {
-      "id": "9",
+      "id": "12",
+      "name": "Информационная безопасность",
+      "groupId": 2
+    },
+    {
+      "id": "13",
+      "name": "Криптография",
+      "groupId": 2
+    },
+    {
+      "id": "14",
+      "name": "Искусственный интеллект",
+      "groupId": 2
+    },
+    {
+      "id": "15",
       "name": "Философия",
       "groupId": 3
     },
     {
-      "id": "10",
+      "id": "16",
       "name": "История",
       "groupId": 3
     },
     {
-      "id": "11",
+      "id": "17",
       "name": "Социология",
+      "groupId": 3
+    },
+    {
+      "id": "18",
+      "name": "Психология",
+      "groupId": 3
+    },
+    {
+      "id": "19",
+      "name": "Логика",
+      "groupId": 3
+    },
+    {
+      "id": "20",
+      "name": "Этика",
       "groupId": 3
     }
   ],
@@ -192,25 +482,25 @@
     },
     {
       "id": "5",
-      "disciplineId": 1,
-      "groupId": 1,
-      "dayOfWeek": 3,
-      "time": "12:45-14:15",
-      "room": "Ауд. 402",
-      "type": "Практика"
-    },
-    {
-      "id": "6",
       "disciplineId": 5,
       "groupId": 1,
       "dayOfWeek": 3,
-      "time": "14:30-16:00",
+      "time": "12:45-14:15",
       "room": "Ауд. 301",
       "type": "Лекция"
     },
     {
+      "id": "6",
+      "disciplineId": 6,
+      "groupId": 1,
+      "dayOfWeek": 3,
+      "time": "14:30-16:00",
+      "room": "Ауд. 305",
+      "type": "Практика"
+    },
+    {
       "id": "7",
-      "disciplineId": 2,
+      "disciplineId": 7,
       "groupId": 1,
       "dayOfWeek": 4,
       "time": "09:00-10:30",
@@ -219,375 +509,177 @@
     },
     {
       "id": "8",
-      "disciplineId": 3,
+      "disciplineId": 8,
       "groupId": 1,
       "dayOfWeek": 4,
       "time": "10:45-12:15",
-      "room": "Ауд. 301",
+      "room": "Ауд. 310",
       "type": "Практика"
     },
     {
       "id": "9",
-      "disciplineId": 4,
+      "disciplineId": 2,
       "groupId": 1,
       "dayOfWeek": 5,
       "time": "09:00-10:30",
-      "room": "Ауд. 104",
+      "room": "Ауд. 205",
       "type": "Лекция"
     },
     {
       "id": "10",
-      "disciplineId": 5,
+      "disciplineId": 1,
       "groupId": 1,
       "dayOfWeek": 5,
+      "time": "10:45-12:15",
+      "room": "Ауд. 402",
+      "type": "Практика"
+    },
+    {
+      "id": "11",
+      "disciplineId": 5,
+      "groupId": 1,
+      "dayOfWeek": 6,
+      "time": "09:00-10:30",
+      "room": "Ауд. 301",
+      "type": "Консультация"
+    },
+    {
+      "id": "12",
+      "disciplineId": 3,
+      "groupId": 1,
+      "dayOfWeek": 6,
       "time": "10:45-12:15",
       "room": "Ауд. 301",
       "type": "Практика"
     },
     {
-      "id": "11",
-      "disciplineId": 1,
-      "groupId": 1,
-      "dayOfWeek": 6,
+      "id": "13",
+      "disciplineId": 9,
+      "groupId": 2,
+      "dayOfWeek": 1,
       "time": "09:00-10:30",
-      "room": "Ауд. 402",
-      "type": "Консультация"
+      "room": "Ауд. 401",
+      "type": "Лекция"
     },
     {
-      "id": "12",
-      "disciplineId": 2,
-      "groupId": 1,
-      "dayOfWeek": 6,
+      "id": "14",
+      "disciplineId": 10,
+      "groupId": 2,
+      "dayOfWeek": 1,
       "time": "10:45-12:15",
-      "room": "Ауд. 205",
+      "room": "Ауд. 403",
+      "type": "Практика"
+    },
+    {
+      "id": "15",
+      "disciplineId": 11,
+      "groupId": 2,
+      "dayOfWeek": 2,
+      "time": "09:00-10:30",
+      "room": "Ауд. 405",
+      "type": "Лекция"
+    },
+    {
+      "id": "16",
+      "disciplineId": 12,
+      "groupId": 2,
+      "dayOfWeek": 2,
+      "time": "10:45-12:15",
+      "room": "Ауд. 407",
+      "type": "Практика"
+    },
+    {
+      "id": "17",
+      "disciplineId": 13,
+      "groupId": 2,
+      "dayOfWeek": 3,
+      "time": "12:45-14:15",
+      "room": "Ауд. 409",
+      "type": "Лекция"
+    },
+    {
+      "id": "18",
+      "disciplineId": 14,
+      "groupId": 2,
+      "dayOfWeek": 3,
+      "time": "14:30-16:00",
+      "room": "Ауд. 411",
+      "type": "Практика"
+    },
+    {
+      "id": "19",
+      "disciplineId": 15,
+      "groupId": 3,
+      "dayOfWeek": 1,
+      "time": "09:00-10:30",
+      "room": "Ауд. 501",
+      "type": "Лекция"
+    },
+    {
+      "id": "20",
+      "disciplineId": 16,
+      "groupId": 3,
+      "dayOfWeek": 1,
+      "time": "10:45-12:15",
+      "room": "Ауд. 503",
+      "type": "Практика"
+    },
+    {
+      "id": "21",
+      "disciplineId": 17,
+      "groupId": 3,
+      "dayOfWeek": 2,
+      "time": "09:00-10:30",
+      "room": "Ауд. 505",
+      "type": "Лекция"
+    },
+    {
+      "id": "22",
+      "disciplineId": 18,
+      "groupId": 3,
+      "dayOfWeek": 2,
+      "time": "10:45-12:15",
+      "room": "Ауд. 507",
+      "type": "Практика"
+    },
+    {
+      "id": "23",
+      "disciplineId": 19,
+      "groupId": 3,
+      "dayOfWeek": 3,
+      "time": "12:45-14:15",
+      "room": "Ауд. 509",
+      "type": "Лекция"
+    },
+    {
+      "id": "24",
+      "disciplineId": 20,
+      "groupId": 3,
+      "dayOfWeek": 3,
+      "time": "14:30-16:00",
+      "room": "Ауд. 511",
       "type": "Практика"
     }
   ],
   "attendance": [
     {
-      "id": "1",
-      "studentId": 1,
-      "disciplineId": 1,
-      "date": "2026-06-22",
-      "status": "П"
-    },
-    {
-      "id": "2",
-      "studentId": 1,
-      "disciplineId": 2,
-      "date": "2026-06-22",
-      "status": "П"
-    },
-    {
-      "id": "3",
-      "studentId": 1,
-      "disciplineId": 3,
-      "date": "2026-06-23",
-      "status": "Н"
-    },
-    {
-      "id": "4",
-      "studentId": 2,
-      "disciplineId": 1,
-      "date": "2026-06-22",
-      "status": "П"
-    },
-    {
-      "id": "5",
-      "studentId": 2,
-      "disciplineId": 2,
-      "date": "2026-06-22",
-      "status": "Н"
-    },
-    {
-      "id": "6",
-      "studentId": 3,
-      "disciplineId": 1,
-      "date": "2026-06-22",
-      "status": "Б"
-    },
-    {
-      "id": "7",
-      "studentId": 3,
-      "disciplineId": 3,
-      "date": "2026-06-23",
-      "status": "П"
-    },
-    {
-      "id": "8",
-      "studentId": 4,
-      "disciplineId": 2,
-      "date": "2026-06-22",
-      "status": "П"
-    },
-    {
-      "studentId": 1,
-      "disciplineId": 1,
-      "date": "2026-06-23",
-      "status": "Н",
-      "id": "nTleYlJUF0s"
-    },
-    {
-      "studentId": 1,
-      "disciplineId": 1,
-      "date": "2026-06-23",
-      "status": "Н",
-      "id": "0O-RcOmwIKA"
-    },
-    {
-      "studentId": 2,
-      "disciplineId": 1,
-      "date": "2026-06-23",
-      "status": "Н",
-      "id": "819jHF_bdMI"
-    },
-    {
-      "studentId": 2,
-      "disciplineId": 1,
-      "date": "2026-06-23",
-      "status": "Н",
-      "id": "5qNw1B1yrNo"
-    },
-    {
-      "studentId": 3,
-      "disciplineId": 1,
-      "date": "2026-06-23",
-      "status": "Н",
-      "id": "70r9BnpTAFo"
-    },
-    {
-      "studentId": 3,
-      "disciplineId": 1,
-      "date": "2026-06-23",
-      "status": "Н",
-      "id": "93zxpHhVTHg"
-    },
-    {
-      "studentId": 4,
-      "disciplineId": 1,
-      "date": "2026-06-23",
-      "status": "Н",
-      "id": "_u1dxmXCT1s"
-    },
-    {
-      "studentId": 4,
-      "disciplineId": 1,
-      "date": "2026-06-23",
-      "status": "Н",
-      "id": "VpwJbNY6AaI"
-    },
-    {
-      "studentId": 1,
-      "disciplineId": 1,
-      "date": "2026-06-23",
-      "status": "Н",
-      "id": "_vqX6t2_MZY"
-    },
-    {
-      "studentId": 2,
-      "disciplineId": 1,
-      "date": "2026-06-23",
-      "status": "Н",
-      "id": "-VJyDMxR7jw"
-    },
-    {
-      "studentId": 3,
-      "disciplineId": 1,
-      "date": "2026-06-23",
-      "status": "Н",
-      "id": "Z2ilMh3_ArE"
-    },
-    {
-      "studentId": 4,
-      "disciplineId": 1,
-      "date": "2026-06-23",
-      "status": "Н",
-      "id": "5cSuRyNwf-4"
-    },
-    {
       "studentId": 1,
       "disciplineId": "1",
-      "date": "2026-06-22",
-      "status": "П",
-      "id": "V6JsuyVVmU8"
-    },
-    {
-      "studentId": 2,
-      "disciplineId": "1",
-      "date": "2026-06-22",
-      "status": "Н",
-      "id": "9fO44DJrC_E"
-    },
-    {
-      "studentId": 3,
-      "disciplineId": "1",
-      "date": "2026-06-23",
-      "status": "Н",
-      "id": "kdPEN48rJMs"
-    },
-    {
-      "studentId": 1,
-      "disciplineId": "1",
-      "date": "2026-06-23",
-      "status": "П",
-      "id": "Yox3c_vIqM4"
-    },
-    {
-      "studentId": 1,
-      "disciplineId": "1",
-      "date": "2026-06-24",
-      "status": "Н",
-      "id": "Dm607WehY8Q"
-    },
-    {
-      "studentId": 2,
-      "disciplineId": "1",
-      "date": "2026-06-24",
-      "status": "Н",
-      "id": "plRkRHgTSZI"
-    },
-    {
-      "studentId": 3,
-      "disciplineId": "1",
-      "date": "2026-06-24",
-      "status": "Н",
-      "id": "4BsfJJlWUF4"
-    },
-    {
-      "studentId": 4,
-      "disciplineId": "1",
-      "date": "2026-06-24",
-      "status": "Н",
-      "id": "5fDeCbf69mk"
-    },
-    {
-      "studentId": 1,
-      "disciplineId": 3,
       "date": "2026-06-24",
       "status": "П",
-      "id": "0ccO4uACbPM"
+      "id": "EX59MLj7pcE"
     }
   ],
   "polls": [
     {
-      "id": "1",
-      "disciplineId": 1,
-      "teacherId": 1,
-      "groupId": 1,
-      "startedAt": "2026-06-23T06:00:00.000Z",
-      "expiresAt": "2026-06-23T06:10:00.000Z",
-      "active": false,
-      "disciplineName": "Высшая математика"
-    },
-    {
-      "disciplineId": 1,
-      "teacherId": 1,
-      "groupId": 1,
-      "startedAt": "2026-06-23T15:34:03.224Z",
-      "expiresAt": "2026-06-23T15:49:03.224Z",
-      "active": false,
-      "disciplineName": "Неизвестно",
-      "id": "3aCrkiK84OA"
-    },
-    {
       "disciplineId": "1",
       "teacherId": 1,
       "groupId": 1,
-      "startedAt": "2026-06-23T16:11:49.007Z",
-      "expiresAt": "2026-06-23T16:26:49.007Z",
+      "startedAt": "2026-06-24T14:05:16.451Z",
+      "expiresAt": "2026-06-24T14:20:16.451Z",
       "active": false,
       "disciplineName": "Высшая математика",
-      "id": "FqlwyEhYNZg"
-    },
-    {
-      "disciplineId": "1",
-      "teacherId": 1,
-      "groupId": 1,
-      "startedAt": "2026-06-24T05:32:18.271Z",
-      "expiresAt": "2026-06-24T05:47:18.271Z",
-      "active": false,
-      "disciplineName": "Высшая математика",
-      "id": "Vw1SOWVU2fE"
-    },
-    {
-      "disciplineId": "1",
-      "teacherId": 1,
-      "groupId": 1,
-      "startedAt": "2026-06-24T05:53:13.301Z",
-      "expiresAt": "2026-06-24T06:08:13.301Z",
-      "active": false,
-      "disciplineName": "Высшая математика",
-      "id": "kWfAtGoAqUw"
-    },
-    {
-      "disciplineId": "1",
-      "teacherId": 1,
-      "groupId": 1,
-      "startedAt": "2026-06-24T05:53:51.559Z",
-      "expiresAt": "2026-06-24T06:08:51.559Z",
-      "active": false,
-      "disciplineName": "Высшая математика",
-      "id": "l9BGppFURqQ"
-    },
-    {
-      "disciplineId": "1",
-      "teacherId": 1,
-      "groupId": 1,
-      "startedAt": "2026-06-24T06:10:05.089Z",
-      "expiresAt": "2026-06-24T06:25:05.089Z",
-      "active": false,
-      "disciplineName": "Высшая математика",
-      "id": "yBoS9tKvni0"
-    },
-    {
-      "disciplineId": 3,
-      "teacherId": 1,
-      "groupId": 1,
-      "startedAt": "2026-06-24T07:01:53.608Z",
-      "expiresAt": "2026-06-24T07:11:53.608Z",
-      "active": false,
-      "disciplineName": "Неизвестно",
-      "id": "P_4KQtzkj28"
-    },
-    {
-      "disciplineId": "1",
-      "teacherId": 1,
-      "groupId": 1,
-      "startedAt": "2026-06-24T07:14:10.702Z",
-      "expiresAt": "2026-06-24T07:29:10.702Z",
-      "active": false,
-      "disciplineName": "Неизвестно",
-      "id": "HjXhLz_U0bw"
-    },
-    {
-      "disciplineId": "1",
-      "teacherId": 1,
-      "groupId": 1,
-      "startedAt": "2026-06-24T07:26:32.840Z",
-      "expiresAt": "2026-06-24T07:41:32.840Z",
-      "active": false,
-      "disciplineName": "Высшая математика",
-      "id": "IkIsY_zxbvw"
-    },
-    {
-      "disciplineId": "6",
-      "teacherId": 1,
-      "groupId": 2,
-      "startedAt": "2026-06-24T07:27:27.577Z",
-      "expiresAt": "2026-06-24T07:42:27.577Z",
-      "active": false,
-      "disciplineName": "Математический анализ",
-      "id": "1Kw8CTWarT8"
-    },
-    {
-      "disciplineId": "1",
-      "teacherId": 1,
-      "groupId": 1,
-      "startedAt": "2026-06-24T07:32:37.222Z",
-      "expiresAt": "2026-06-24T07:47:37.222Z",
-      "active": false,
-      "disciplineName": "Высшая математика",
-      "id": "XhBGWgqZz58"
+      "id": "CqtAlfbjXpY"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

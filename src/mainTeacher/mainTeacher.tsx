@@ -124,6 +124,23 @@ export const MainTeacher: React.FC = () => {
     };
   }, []);
 
+  // Обновляем опросы при изменении списка дисциплин
+  useEffect(() => {
+    if (disciplines.length > 0) {
+      setPolls(prevPolls => 
+        prevPolls.map(poll => {
+          if (!poll.disciplineName || poll.disciplineName === 'Неизвестно' || poll.disciplineName === '') {
+            const disc = disciplines.find(d => d.id === poll.disciplineId);
+            if (disc) {
+              return { ...poll, disciplineName: disc.name };
+            }
+          }
+          return poll;
+        })
+      );
+    }
+  }, [disciplines]);
+
   useEffect(() => {
     const activePoll = polls.find(p => p.active);
     if (activePoll) {
@@ -218,7 +235,18 @@ export const MainTeacher: React.FC = () => {
     try {
       const response = await fetch('/api/polls');
       const data = await response.json();
-      setPolls(Array.isArray(data) ? data : []);
+      
+      const pollsWithNames = Array.isArray(data) ? data.map((poll: Poll) => {
+        if (!poll.disciplineName || poll.disciplineName === 'Неизвестно' || poll.disciplineName === '') {
+          const disc = disciplines.find(d => d.id === poll.disciplineId);
+          if (disc) {
+            return { ...poll, disciplineName: disc.name };
+          }
+        }
+        return poll;
+      }) : [];
+      
+      setPolls(pollsWithNames);
     } catch (error) {
       console.error('Ошибка загрузки опросов:', error);
       setPolls([]);
@@ -259,9 +287,11 @@ export const MainTeacher: React.FC = () => {
 
   const getActivePollDisciplineName = () => {
     if (!activePoll) return 'Неизвестно';
-    if (activePoll.disciplineName && activePoll.disciplineName !== 'Неизвестно') {
+    
+    if (activePoll.disciplineName && activePoll.disciplineName !== 'Неизвестно' && activePoll.disciplineName !== '') {
       return activePoll.disciplineName;
     }
+    
     const disc = disciplines.find(d => d.id === activePoll.disciplineId);
     return disc ? disc.name : 'Неизвестно';
   };

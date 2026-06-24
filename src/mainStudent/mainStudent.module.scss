@@ -1733,3 +1733,537 @@ body,
     flex-shrink: 0;
   }
 }
+/* --- КАСТОМНОЕ УВЕДОМЛЕНИЕ ОБ ОТМЕТКЕ --- */
+.markNotification {
+  position: fixed;
+  top: 100px;
+  right: 30px;
+  z-index: 10000;
+  opacity: 0;
+  transform: translateX(100px);
+  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  max-width: 400px;
+  pointer-events: none;
+}
+
+.markNotificationShow {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.markNotificationContent {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 24px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  pointer-events: auto;
+}
+
+.markSuccess {
+  border-left: 4px solid #22c55e;
+}
+
+.markError {
+  border-left: 4px solid #ef4444;
+}
+
+.markNotificationIcon {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.markSuccess .markNotificationIcon {
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.markError .markNotificationIcon {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.markNotificationText {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.markSuccess .markNotificationText {
+  color: #16a34a;
+}
+
+.markError .markNotificationText {
+  color: #dc2626;
+}
+
+@media (max-width: 768px) {
+  .markNotification {
+    top: 80px;
+    right: 15px;
+    left: 15px;
+    max-width: none;
+  }
+}
+
+/* --- ТОСТ-УВЕДОМЛЕНИЯ --- */
+.toast {
+  position: fixed;
+  top: 100px;
+  right: 30px;
+  z-index: 10000;
+  opacity: 0;
+  transform: translateX(120px) scale(0.9);
+  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  max-width: 420px;
+  pointer-events: none;
+}
+
+.toastShow {
+  opacity: 1;
+  transform: translateX(0) scale(1);
+}
+
+.toastContent {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 24px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  pointer-events: auto;
+  position: relative;
+  overflow: hidden;
+}
+
+.toastContent::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  animation: toastProgress 4s linear forwards;
+}
+
+.toastSuccess::before {
+  background: #22c55e;
+}
+
+.toastError::before {
+  background: #ef4444;
+}
+
+.toastInfo::before {
+  background: #0A84FF;
+}
+
+@keyframes toastProgress {
+  0% { width: 100%; }
+  100% { width: 0%; }
+}
+
+.toastIcon {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toastSuccess .toastIcon {
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.toastError .toastIcon {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.toastInfo .toastIcon {
+  background: rgba(10, 132, 255, 0.1);
+}
+
+.toastText {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.toastSuccess .toastText {
+  color: #16a34a;
+}
+
+.toastError .toastText {
+  color: #dc2626;
+}
+
+.toastInfo .toastText {
+  color: #0A84FF;
+}
+
+@media (max-width: 768px) {
+  .toast {
+    top: 80px;
+    right: 15px;
+    left: 15px;
+    max-width: none;
+  }
+}
+
+/* --- ТОСТ-УВЕДОМЛЕНИЯ --- */
+.toast {
+  position: fixed;
+  top: 100px;
+  right: 30px;
+  z-index: 10000;
+  opacity: 0;
+  transform: translateX(120px) scale(0.9);
+  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  max-width: 420px;
+  pointer-events: none;
+}
+
+.toastShow {
+  opacity: 1;
+  transform: translateX(0) scale(1);
+}
+
+.toastContent {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 24px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  pointer-events: auto;
+  position: relative;
+  overflow: hidden;
+}
+
+.toastContent::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  animation: toastProgress 4s linear forwards;
+}
+
+.toastSuccess::before {
+  background: #22c55e;
+}
+
+.toastError::before {
+  background: #ef4444;
+}
+
+.toastInfo::before {
+  background: #0A84FF;
+}
+
+@keyframes toastProgress {
+  0% { width: 100%; }
+  100% { width: 0%; }
+}
+
+.toastIcon {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toastSuccess .toastIcon {
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.toastError .toastIcon {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.toastInfo .toastIcon {
+  background: rgba(10, 132, 255, 0.1);
+}
+
+.toastText {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.toastSuccess .toastText {
+  color: #16a34a;
+}
+
+.toastError .toastText {
+  color: #dc2626;
+}
+
+.toastInfo .toastText {
+  color: #0A84FF;
+}
+
+@media (max-width: 768px) {
+  .toast {
+    top: 80px;
+    right: 15px;
+    left: 15px;
+    max-width: none;
+  }
+}
+
+/* --- УВЕДОМЛЕНИЯ (КАК У ПРЕПОДАВАТЕЛЯ) --- */
+.notificationsList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.notificationsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0 8px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.notificationsCount {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.clearAllBtn {
+  font-size: 12px;
+  color: #ef4444;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.clearAllBtn:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.notificationItem {
+  display: flex;
+  gap: 10px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  align-items: flex-start;
+}
+
+.notificationItem:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.notificationItem.unread {
+  background: rgba(10, 132, 255, 0.08);
+  border-color: rgba(10, 132, 255, 0.2);
+}
+
+.notificationItem.unread::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 24px;
+  background: #0A84FF;
+  border-radius: 0 3px 3px 0;
+}
+
+.notificationIcon {
+  width: 32px;
+  height: 32px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.notificationContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.notificationTitle {
+  font-weight: 700;
+  color: #1e293b;
+  font-size: 13px;
+  margin-bottom: 2px;
+}
+
+.notificationDesc {
+  color: #475569;
+  font-size: 12px;
+  margin-top: 1px;
+  line-height: 1.4;
+}
+
+.notificationTime {
+  color: #94a3b8;
+  font-size: 11px;
+  margin-top: 4px;
+}
+
+.notificationsEmpty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  color: #94a3b8;
+  gap: 12px;
+}
+
+.notificationsEmpty svg {
+  opacity: 0.5;
+}
+
+.notificationsEmpty span {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+// Добавьте эти стили в ваш файл groupAttendance.module.scss
+
+// Контейнер для таблицы с ограничением высоты и скроллом
+.tableScrollContainer {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.tableWrapper {
+  flex: 1;
+  overflow: auto;
+  position: relative;
+  
+  // Стили для скроллбара
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 10px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: #0A84FF;
+    border-radius: 10px;
+  }
+  
+  &::-webkit-scrollbar-thumb:hover {
+    background: #0066cc;
+  }
+}
+
+// Сам контейнер секции с таблицей
+.tableSection {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  border-radius: 24px;
+  padding: 24px 28px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+  height: 100%;
+}
+
+// Обертка контента (сайдбар + таблица)
+.contentWrapper {
+  display: flex;
+  gap: 28px;
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+  padding-bottom: 20px;
+}
+
+// Главный контейнер
+.mainContainer {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 20px 32px 10px 32px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+// Адаптация для разных размеров экрана
+@media (max-width: 1200px) {
+  .mainContainer {
+    padding: 16px 20px 10px 20px;
+  }
+  
+  .contentWrapper {
+    gap: 16px;
+  }
+  
+  .tableSection {
+    padding: 16px 18px;
+  }
+}
+
+@media (max-width: 768px) {
+  .contentWrapper {
+    flex-direction: column;
+  }
+  
+  .sidebar {
+    flex-shrink: 0;
+  }
+  
+  .tableSection {
+    min-height: 400px;
+  }
+}

@@ -85,6 +85,9 @@ export const GroupAttendance: React.FC = () => {
   const [pollTimeLeft, setPollTimeLeft] = useState(0);
   const [pollSecondsLeft, setPollSecondsLeft] = useState(0);
 
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [pendingCancelPoll, setPendingCancelPoll] = useState<Poll | null>(null);
+
   React.useEffect(() => {
     localStorage.setItem(AVATAR_COLOR_KEY, selectedColor);
   }, [selectedColor]);
@@ -93,8 +96,34 @@ export const GroupAttendance: React.FC = () => {
     if (groupId) {
       fetchGroupData(groupId);
       fetchPolls();
+      
+      // Обновляем данные каждые 3 секунды для实时 синхронизации
+      const interval = setInterval(() => {
+        if (groupId) {
+          fetchAttendanceData(groupId);
+        }
+      }, 3000);
+      
+      return () => clearInterval(interval);
     }
   }, [groupId]);
+
+  // Обновляем опросы при изменении списка дисциплин
+  useEffect(() => {
+    if (disciplines.length > 0) {
+      setPolls(prevPolls => 
+        prevPolls.map(poll => {
+          if (!poll.disciplineName || poll.disciplineName === 'Неизвестно' || poll.disciplineName === '') {
+            const disc = disciplines.find(d => d.id === poll.disciplineId);
+            if (disc) {
+              return { ...poll, disciplineName: disc.name };
+            }
+          }
+          return poll;
+        })
+      );
+    }
+  }, [disciplines]);
 
   useEffect(() => {
     const activePoll = polls.find(p => p.active && p.groupId === parseInt(groupId || '0'));
@@ -120,7 +149,15 @@ export const GroupAttendance: React.FC = () => {
           setIsPollActive(false);
           setPollTimeLeft(0);
           setPollSecondsLeft(0);
-          handlePollEnd(activePoll);
+          // Завершаем опрос и обновляем страницу
+          handlePollEnd(activePoll).then(() => {
+            Promise.all([
+              fetchPolls(),
+              fetchGroupData(groupId || '')
+            ]).then(() => {
+              setIsPollActive(false);
+            });
+          });
           return;
         }
         
@@ -163,27 +200,27 @@ export const GroupAttendance: React.FC = () => {
 
   const fetchGroupData = async (id: string) => {
     try {
-      const [groupRes, studentsRes, disciplinesRes, attendanceRes] = await Promise.all([
+      const [groupRes, studentsRes, disciplinesRes] = await Promise.all([
         fetch(`/api/groups/${id}`),
         fetch(`/api/students?groupId=${id}`),
-        fetch(`/api/disciplines?groupId=${id}`),
-        fetch(`/api/attendance`)
+        fetch(`/api/disciplines?groupId=${id}`)
       ]);
 
       const groupData = await groupRes.json();
       const studentsData = await studentsRes.json();
       const disciplinesData = await disciplinesRes.json();
-      const attendanceData = await attendanceRes.json();
 
       setGroup(groupData);
       setStudents(studentsData);
       setDisciplines(disciplinesData);
-      setAttendance(attendanceData);
       
       if (disciplinesData.length > 0) {
         setSelectedDiscipline(disciplinesData[0].id);
         setPollDiscipline(disciplinesData[0].id);
       }
+      
+      // Загружаем посещаемость отдельно
+      await fetchAttendanceData(id);
     } catch (error) {
       console.error('Ошибка загрузки данных:', error);
     } finally {
@@ -191,11 +228,33 @@ export const GroupAttendance: React.FC = () => {
     }
   };
 
+  // Новая функция для обновления только посещаемости
+  const fetchAttendanceData = async (id: string) => {
+    try {
+      const attendanceRes = await fetch(`/api/attendance`);
+      const attendanceData = await attendanceRes.json();
+      setAttendance(Array.isArray(attendanceData) ? attendanceData : []);
+    } catch (error) {
+      console.error('Ошибка загрузки посещаемости:', error);
+    }
+  };
+
   const fetchPolls = async () => {
     try {
       const response = await fetch('/api/polls');
       const data = await response.json();
-      setPolls(data);
+      
+      const pollsWithNames = Array.isArray(data) ? data.map((poll: Poll) => {
+        if (!poll.disciplineName || poll.disciplineName === 'Неизвестно' || poll.disciplineName === '') {
+          const disc = disciplines.find(d => d.id === poll.disciplineId);
+          if (disc) {
+            return { ...poll, disciplineName: disc.name };
+          }
+        }
+        return poll;
+      }) : [];
+      
+      setPolls(pollsWithNames);
     } catch (error) {
       console.error('Ошибка загрузки опросов:', error);
     }
@@ -217,10 +276,16 @@ export const GroupAttendance: React.FC = () => {
   const getWeekDates = () => {
     const start = new Date(weekStart);
     const dates = [];
-    for (let i = 0; i < 6; i++) {
+    let dayCount = 0;
+    let i = 0;
+    while (dayCount < 6 && i < 10) {
       const d = new Date(start);
       d.setDate(d.getDate() + i);
-      dates.push(d);
+      if (d.getDay() !== 0) {
+        dates.push(d);
+        dayCount++;
+      }
+      i++;
     }
     return dates;
   };
@@ -230,7 +295,9 @@ export const GroupAttendance: React.FC = () => {
     const daysInMonth = new Date(selectedYear, selectedMonth + 1, 0).getDate();
     for (let i = 1; i <= daysInMonth; i++) {
       const d = new Date(selectedYear, selectedMonth, i);
-      dates.push(d);
+      if (d.getDay() !== 0) {
+        dates.push(d);
+      }
     }
     return dates;
   };
@@ -306,7 +373,16 @@ export const GroupAttendance: React.FC = () => {
   const formatWeekRange = () => {
     const start = new Date(weekStart);
     const end = new Date(weekStart);
-    end.setDate(end.getDate() + 5);
+    let daysToAdd = 0;
+    for (let i = 0; i < 7; i++) {
+      const d = new Date(start);
+      d.setDate(d.getDate() + i);
+      if (d.getDay() === 6) {
+        daysToAdd = i;
+        break;
+      }
+    }
+    end.setDate(end.getDate() + daysToAdd);
     return `${start.getDate()} ${monthNames[start.getMonth()]} по ${end.getDate()} ${monthNames[end.getMonth()]}`;
   };
 
@@ -353,18 +429,24 @@ export const GroupAttendance: React.FC = () => {
       setIsPollActive(true);
       setPollTimeLeft(pollMinutes);
       setPollSecondsLeft(0);
+      
+      await fetchPolls();
     } catch (error) {
       console.error('Ошибка создания опроса:', error);
     }
   };
 
-  const cancelPoll = async () => {
-    const activePoll = polls.find(p => p.active && p.groupId === parseInt(groupId || '0'));
-    if (!activePoll) return;
+  const showCancelConfirmation = (poll: Poll) => {
+    setPendingCancelPoll(poll);
+    setShowConfirmModal(true);
+  };
 
-    if (!confirm(`Вы уверены, что хотите отменить опрос по "${getDisciplineName(activePoll.disciplineId)}"?`)) {
-      return;
-    }
+  const confirmCancelPoll = async () => {
+    if (!pendingCancelPoll) return;
+    
+    setShowConfirmModal(false);
+    const activePoll = pendingCancelPoll;
+    setPendingCancelPoll(null);
 
     try {
       await fetch(`/api/polls/${activePoll.id}`, {
@@ -397,69 +479,99 @@ export const GroupAttendance: React.FC = () => {
         clearInterval(pollTimer);
         setPollTimer(null);
       }
+      
+      await Promise.all([
+        fetchPolls(),
+        fetchGroupData(groupId || '')
+      ]);
     } catch (error) {
       console.error('Ошибка отмены опроса:', error);
       alert('Не удалось отменить опрос');
     }
   };
 
+  const cancelCancelPoll = () => {
+    setShowConfirmModal(false);
+    setPendingCancelPoll(null);
+  };
+
+  // ИСПРАВЛЕННАЯ ФУНКЦИЯ handlePollEnd
   const handlePollEnd = async (poll: Poll) => {
     const today = new Date().toISOString().split('T')[0];
+    const disciplineId = poll.disciplineId;
     
+    // Сначала обновляем данные посещаемости с сервера
+    await fetchAttendanceData(groupId || '');
+    
+    // Получаем актуальные записи посещаемости для этой дисциплины на сегодня
+    const existingRecords = attendance.filter(
+      a => a.disciplineId === disciplineId && a.date === today
+    );
+    
+    // Создаем Set из ID студентов, которые уже отметились
+    const markedStudentIds = new Set(existingRecords.map(r => r.studentId));
+    
+    // Для каждого студента в группе
     for (const student of students) {
-      const existing = attendance.find(
-        a => a.studentId === parseInt(student.id) && 
-             a.disciplineId === poll.disciplineId && 
-             a.date === today
-      );
+      const studentId = parseInt(student.id);
       
-      if (!existing) {
+      // Проверяем, отметился ли студент
+      if (!markedStudentIds.has(studentId)) {
+        // Если не отметился - создаем запись с статусом 'Н'
         await updateAttendance(
-          parseInt(student.id),
-          poll.disciplineId,
+          studentId,
+          disciplineId,
           today,
           'Н'
         );
       }
+      // Если отметился - запись уже есть с статусом 'П', ничего не меняем
     }
     
+    // Завершаем опрос на сервере
     try {
       await fetch(`/api/polls/${poll.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ active: false })
       });
-      
-      setPolls(prev => prev.map(p => p.id === poll.id ? { ...p, active: false } : p));
-      setIsPollActive(false);
-      setPollTimeLeft(0);
-      setPollSecondsLeft(0);
     } catch (error) {
       console.error('Ошибка завершения опроса:', error);
     }
+    
+    // Обновляем данные после завершения
+    await fetchAttendanceData(groupId || '');
   };
 
   const downloadReport = () => {
     const currentDates = getCurrentDates();
+    const filteredDates = currentDates.filter(date => date.getDay() !== 0);
+    
+    const totalColumns = 3 + filteredDates.length + 3;
+    const isLandscape = totalColumns > 10 || viewMode === 'month';
+    const pageOrientation = isLandscape ? 'Landscape' : 'Portrait';
     
     let periodTitle = '';
     if (viewMode === 'day') {
-      const date = currentDates[0];
+      const date = filteredDates[0];
       periodTitle = `За ${date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })}`;
     } else if (viewMode === 'week') {
-      const start = currentDates[0];
-      const end = currentDates[currentDates.length - 1];
+      const start = filteredDates[0];
+      const end = filteredDates[filteredDates.length - 1];
       periodTitle = `За неделю с ${start.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })} по ${end.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })}`;
     } else {
       periodTitle = `За ${monthNames[selectedMonth]} ${selectedYear} года`;
     }
 
-    // ПРАВИЛЬНОЕ ПОЛУЧЕНИЕ НАЗВАНИЯ ДИСЦИПЛИНЫ
     let disciplineName = 'Все дисциплины';
     if (selectedDiscipline !== null) {
       const found = disciplines.find(d => d.id === selectedDiscipline);
       disciplineName = found ? found.name : 'Неизвестно';
     }
+
+    const fontSize = filteredDates.length > 20 ? '6pt' : filteredDates.length > 15 ? '7pt' : '9pt';
+    const headerFontSize = filteredDates.length > 20 ? '7pt' : filteredDates.length > 15 ? '8pt' : '10pt';
+    const cellPadding = filteredDates.length > 20 ? '2px' : '4px';
 
     let tableRows = '';
     let totals: { [key: string]: { total: number; present: number; absent: number; respected: number; notRespected: number } } = {};
@@ -472,10 +584,10 @@ export const GroupAttendance: React.FC = () => {
       let notRespected = 0;
 
       let row = `<tr>
-        <td style="border:1px solid #000;padding:6px;text-align:center;">${index + 1}</td>
-        <td style="border:1px solid #000;padding:6px;">${student.fullName}</td>`;
+        <td style="border:1px solid #000;padding:${cellPadding};text-align:center;font-size:${fontSize};">${index + 1}</td>
+        <td style="border:1px solid #000;padding:${cellPadding};font-size:${fontSize};">${student.fullName}</td>`;
 
-      currentDates.forEach((date) => {
+      filteredDates.forEach((date) => {
         const dateStr = date.toISOString().split('T')[0];
         const disciplineId = selectedDiscipline || (disciplines.length > 0 ? disciplines[0].id : 0);
         const status = getStudentAttendance(parseInt(student.id), disciplineId, dateStr);
@@ -483,13 +595,13 @@ export const GroupAttendance: React.FC = () => {
         if (status === 'П') { total++; present++; respected++; }
         else if (status === 'Н') { total++; absent++; notRespected++; }
         
-        row += `<td style="border:1px solid #000;padding:6px;text-align:center;">${status}</td>`;
+        row += `<td style="border:1px solid #000;padding:${cellPadding};text-align:center;font-size:${fontSize};">${status}</td>`;
       });
 
       row += `
-        <td style="border:1px solid #000;padding:6px;text-align:center;">${total}</td>
-        <td style="border:1px solid #000;padding:6px;text-align:center;">${respected}</td>
-        <td style="border:1px solid #000;padding:6px;text-align:center;">${notRespected}</td>
+        <td style="border:1px solid #000;padding:${cellPadding};text-align:center;font-size:${fontSize};">${total}</td>
+        <td style="border:1px solid #000;padding:${cellPadding};text-align:center;font-size:${fontSize};">${respected}</td>
+        <td style="border:1px solid #000;padding:${cellPadding};text-align:center;font-size:${fontSize};">${notRespected}</td>
       </tr>`;
 
       tableRows += row;
@@ -508,12 +620,12 @@ export const GroupAttendance: React.FC = () => {
     });
 
     const totalStudents = students.length;
-    const averageAttendance = totalStudents > 0 ? Math.round((totalAll / (totalStudents * currentDates.length)) * 100) : 0;
+    const averageAttendance = totalStudents > 0 ? Math.round((totalAll / (totalStudents * filteredDates.length)) * 100) : 0;
 
     let dateHeaders = '';
-    currentDates.forEach((date) => {
+    filteredDates.forEach((date) => {
       const dayName = weekDays[date.getDay() === 0 ? 6 : date.getDay() - 1];
-      dateHeaders += `<th style="border:1px solid #000;padding:6px;text-align:center;font-size:11px;">
+      dateHeaders += `<th style="border:1px solid #000;padding:${cellPadding};text-align:center;font-size:${headerFontSize};">
         ${dayName}<br>${date.getDate()}.${date.getMonth() + 1}
       </th>`;
     });
@@ -530,18 +642,24 @@ export const GroupAttendance: React.FC = () => {
           <w:WordDocument>
             <w:View>Print</w:View>
             <w:Zoom>100</w:Zoom>
+            <w:DoNotOptimizeForBrowser/>
           </w:WordDocument>
         </xml>
         <![endif]-->
         <style>
-          body { font-family: 'Times New Roman', Times, serif; margin: 40px; }
-          h1 { text-align: center; font-size: 18pt; margin-bottom: 10px; }
-          .subtitle { text-align: center; font-size: 14pt; margin-bottom: 20px; color: #555; }
-          table { border-collapse: collapse; width: 100%; font-size: 11pt; }
-          th { background: #e8f0fe; font-weight: bold; }
+          body { font-family: 'Times New Roman', Times, serif; margin: 0.3cm; }
+          @page { 
+            size: ${pageOrientation}; 
+            margin: 0.3cm;
+          }
+          h1 { text-align: center; font-size: ${isLandscape ? '14pt' : '18pt'}; margin-bottom: 5px; }
+          .subtitle { text-align: center; font-size: ${isLandscape ? '9pt' : '12pt'}; margin-bottom: 8px; color: #555; }
+          table { border-collapse: collapse; width: 100%; font-size: ${fontSize}; }
+          th { background: #e8f0fe; font-weight: bold; font-size: ${headerFontSize}; }
           .total-row { background: #f0f0f0; font-weight: bold; }
           .total-label { font-weight: bold; }
-          .footer-text { text-align: center; margin-top: 20px; font-size: 10pt; color: #888; }
+          .footer-text { text-align: center; margin-top: 8px; font-size: 7pt; color: #888; }
+          p { font-size: ${isLandscape ? '8pt' : '11pt'}; margin: 2px 0; }
         </style>
       </head>
       <body>
@@ -554,12 +672,12 @@ export const GroupAttendance: React.FC = () => {
         <table>
           <thead>
             <tr>
-              <th style="border:1px solid #000;padding:6px;text-align:center;width:40px;">№</th>
-              <th style="border:1px solid #000;padding:6px;text-align:left;">ФИО студента</th>
+              <th style="border:1px solid #000;padding:${cellPadding};text-align:center;width:25px;font-size:${headerFontSize};">№</th>
+              <th style="border:1px solid #000;padding:${cellPadding};text-align:left;font-size:${headerFontSize};">ФИО студента</th>
               ${dateHeaders}
-              <th style="border:1px solid #000;padding:6px;text-align:center;">Всего</th>
-              <th style="border:1px solid #000;padding:6px;text-align:center;">Уваж.</th>
-              <th style="border:1px solid #000;padding:6px;text-align:center;">Неуваж.</th>
+              <th style="border:1px solid #000;padding:${cellPadding};text-align:center;font-size:${headerFontSize};">Всего</th>
+              <th style="border:1px solid #000;padding:${cellPadding};text-align:center;font-size:${headerFontSize};">Уваж.</th>
+              <th style="border:1px solid #000;padding:${cellPadding};text-align:center;font-size:${headerFontSize};">Неуваж.</th>
             </tr>
           </thead>
           <tbody>
@@ -567,14 +685,14 @@ export const GroupAttendance: React.FC = () => {
           </tbody>
           <tfoot>
             <tr class="total-row">
-              <td colspan="2" style="border:1px solid #000;padding:6px;text-align:right;">ИТОГО:</td>
-              <td style="border:1px solid #000;padding:6px;text-align:center;">${totalAll}</td>
-              <td style="border:1px solid #000;padding:6px;text-align:center;">${totalRespected}</td>
-              <td style="border:1px solid #000;padding:6px;text-align:center;">${totalNotRespected}</td>
+              <td colspan="2" style="border:1px solid #000;padding:${cellPadding};text-align:right;font-size:${fontSize};">ИТОГО:</td>
+              <td style="border:1px solid #000;padding:${cellPadding};text-align:center;font-size:${fontSize};">${totalAll}</td>
+              <td style="border:1px solid #000;padding:${cellPadding};text-align:center;font-size:${fontSize};">${totalRespected}</td>
+              <td style="border:1px solid #000;padding:${cellPadding};text-align:center;font-size:${fontSize};">${totalNotRespected}</td>
             </tr>
             <tr>
-              <td colspan="2" style="border:1px solid #000;padding:6px;text-align:right;">Средняя посещаемость:</td>
-              <td colspan="3" style="border:1px solid #000;padding:6px;text-align:center;font-weight:bold;">${averageAttendance}%</td>
+              <td colspan="2" style="border:1px solid #000;padding:${cellPadding};text-align:right;font-size:${fontSize};">Средняя посещаемость:</td>
+              <td colspan="3" style="border:1px solid #000;padding:${cellPadding};text-align:center;font-weight:bold;font-size:${fontSize};">${averageAttendance}%</td>
             </tr>
           </tfoot>
         </table>
@@ -734,9 +852,9 @@ export const GroupAttendance: React.FC = () => {
                     </span>
                     <span className={styles.pollActiveDiscipline}>
                       {(() => {
-                        const activePoll = polls.find(p => p.active);
+                        const activePoll = polls.find(p => p.active && p.groupId === parseInt(groupId || '0'));
                         if (!activePoll) return 'Неизвестно';
-                        if (activePoll.disciplineName && activePoll.disciplineName !== 'Неизвестно') {
+                        if (activePoll.disciplineName && activePoll.disciplineName !== 'Неизвестно' && activePoll.disciplineName !== '') {
                           return activePoll.disciplineName;
                         }
                         return getDisciplineName(activePoll.disciplineId);
@@ -757,7 +875,10 @@ export const GroupAttendance: React.FC = () => {
                   marginTop: '8px'
                 }}>
                   <button 
-                    onClick={cancelPoll}
+                    onClick={() => {
+                      const activePoll = polls.find(p => p.active && p.groupId === parseInt(groupId || '0'));
+                      if (activePoll) showCancelConfirmation(activePoll);
+                    }}
                     style={{
                       display: 'flex',
                       alignItems: 'center',
@@ -930,90 +1051,123 @@ export const GroupAttendance: React.FC = () => {
                 </div>
               </div>
 
-              <div className={styles.tableWrapper}>
-                <table className={styles.attendanceTable}>
-                  <thead>
-                    <tr>
-                      <th>№</th>
-                      <th>ФИО студента</th>
-                      {currentDates.map((date, i) => (
-                        <th key={i}>
-                          {viewMode === 'day' ? (
-                            <>
-                              {weekDays[date.getDay() === 0 ? 6 : date.getDay() - 1]}<br />
-                              <span className={styles.dateSmall}>
-                                {date.getDate()}.{date.getMonth() + 1}
-                              </span>
-                            </>
-                          ) : (
-                            <>
-                              {weekDays[date.getDay() === 0 ? 6 : date.getDay() - 1]}<br />
-                              <span className={styles.dateSmall}>
-                                {date.getDate()}.{date.getMonth() + 1}
-                              </span>
-                            </>
-                          )}
-                        </th>
-                      ))}
-                      <th>Всего</th>
-                      <th>Уваж.</th>
-                      <th>Неуваж.</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {students.map((student, index) => {
-                      let total = 0;
-                      let respected = 0;
-                      let notRespected = 0;
+              {/* ОБЕРТКА ТАБЛИЦЫ С ОГРАНИЧЕНИЕМ ВЫСОТЫ И СКРОЛЛОМ */}
+              <div className={styles.tableScrollContainer}>
+                <div className={styles.tableWrapper}>
+                  <table className={styles.attendanceTable}>
+                    <thead>
+                      <tr>
+                        <th className={styles.stickyCol}>№</th>
+                        <th className={styles.stickyColName}>ФИО студента</th>
+                        {currentDates.map((date, i) => (
+                          <th key={i}>
+                            {viewMode === 'day' ? (
+                              <>
+                                {weekDays[date.getDay() === 0 ? 6 : date.getDay() - 1]}<br />
+                                <span className={styles.dateSmall}>
+                                  {date.getDate()}.{date.getMonth() + 1}
+                                </span>
+                              </>
+                            ) : (
+                              <>
+                                {weekDays[date.getDay() === 0 ? 6 : date.getDay() - 1]}<br />
+                                <span className={styles.dateSmall}>
+                                  {date.getDate()}.{date.getMonth() + 1}
+                                </span>
+                              </>
+                            )}
+                          </th>
+                        ))}
+                        <th>Всего</th>
+                        <th>Уваж.</th>
+                        <th>Неуваж.</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {students.map((student, index) => {
+                        let total = 0;
+                        let respected = 0;
+                        let notRespected = 0;
 
-                      return (
-                        <tr key={student.id}>
-                          <td>{index + 1}</td>
-                          <td>{student.fullName}</td>
-                          {currentDates.map((date, i) => {
-                            const dateStr = date.toISOString().split('T')[0];
-                            const disciplineId = selectedDiscipline || (disciplines.length > 0 ? disciplines[0].id : 0);
-                            const status = getStudentAttendance(parseInt(student.id), disciplineId, dateStr);
-                            
-                            if (status === 'П') { total++; respected++; }
-                            else if (status === 'Н') { total++; notRespected++; }
-                            
-                            return (
-                              <td key={i}>
-                                <select 
-                                  className={`${styles.statusSelect} ${status === 'П' ? styles.present : status === 'Н' ? styles.absent : ''}`}
-                                  value={status}
-                                  onChange={(e) => {
-                                    const newStatus = e.target.value;
-                                    updateAttendance(
-                                      parseInt(student.id),
-                                      disciplineId,
-                                      dateStr,
-                                      newStatus
-                                    );
-                                  }}
-                                >
-                                  <option value="-">-</option>
-                                  <option value="П">П</option>
-                                  <option value="Н">Н</option>
-                                  <option value="Б">Б</option>
-                                </select>
-                              </td>
-                            );
-                          })}
-                          <td>{total}</td>
-                          <td>{respected}</td>
-                          <td>{notRespected}</td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+                        return (
+                          <tr key={student.id}>
+                            <td className={styles.stickyCol} style={{ textAlign: 'center' }}>{index + 1}</td>
+                            <td className={styles.stickyColName}>{student.fullName}</td>
+                            {currentDates.map((date, i) => {
+                              const dateStr = date.toISOString().split('T')[0];
+                              const disciplineId = selectedDiscipline || (disciplines.length > 0 ? disciplines[0].id : 0);
+                              const status = getStudentAttendance(parseInt(student.id), disciplineId, dateStr);
+                              
+                              if (status === 'П') { total++; respected++; }
+                              else if (status === 'Н') { total++; notRespected++; }
+                              
+                              return (
+                                <td key={i} style={{ textAlign: 'center' }}>
+                                  <select 
+                                    className={`${styles.statusSelect} ${status === 'П' ? styles.present : status === 'Н' ? styles.absent : ''}`}
+                                    value={status}
+                                    onChange={(e) => {
+                                      const newStatus = e.target.value;
+                                      updateAttendance(
+                                        parseInt(student.id),
+                                        disciplineId,
+                                        dateStr,
+                                        newStatus
+                                      );
+                                    }}
+                                  >
+                                    <option value="-">-</option>
+                                    <option value="П">П</option>
+                                    <option value="Н">Н</option>
+                                    <option value="Б">Б</option>
+                                  </select>
+                                </td>
+                              );
+                            })}
+                            <td style={{ textAlign: 'center' }}>{total}</td>
+                            <td style={{ textAlign: 'center' }}>
+                              <span className={styles.respectedBadge}>{respected}</span>
+                            </td>
+                            <td style={{ textAlign: 'center' }}>
+                              <span className={styles.notRespectedBadge}>{notRespected}</span>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </section>
           </div>
         </main>
       </div>
+
+      <Modal isOpen={showConfirmModal} onClose={cancelCancelPoll} title="Подтверждение">
+        <div className={styles.confirmModalContent}>
+          <p className={styles.confirmText}>
+            Вы уверены, что хотите отменить опрос по "{pendingCancelPoll ? 
+              (pendingCancelPoll.disciplineName && pendingCancelPoll.disciplineName !== 'Неизвестно' && pendingCancelPoll.disciplineName !== ''
+                ? pendingCancelPoll.disciplineName 
+                : getDisciplineName(pendingCancelPoll.disciplineId)) 
+              : 'Неизвестно'}"?
+          </p>
+          <div className={styles.confirmButtons}>
+            <button 
+              className={styles.confirmCancelBtn}
+              onClick={cancelCancelPoll}
+            >
+              Отмена
+            </button>
+            <button 
+              className={styles.confirmDeleteBtn}
+              onClick={confirmCancelPoll}
+            >
+              Да, отменить
+            </button>
+          </div>
+        </div>
+      </Modal>
 
       <Modal isOpen={showProfile} onClose={() => setShowProfile(false)} title="Профиль">
         <div className={styles.profileContent}>

@@ -1335,3 +1335,518 @@
     justify-content: center;
   }
 }
+.attendanceTable {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 4px;
+  font-size: 12px;
+}
+
+/* --- ФИКСАЦИЯ ПЕРВЫХ ДВУХ КОЛОНОК (РАБОТАЕТ ДЛЯ ВСЕХ РЕЖИМОВ) --- */
+
+/* Контейнер таблицы с горизонтальным скроллом */
+.tableWrapper {
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: 500px;
+  position: relative;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Таблица */
+.attendanceTable {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 4px;
+  font-size: 12px;
+  min-width: 600px;
+}
+
+/* --- ФИКСАЦИЯ ПЕРВЫХ ДВУХ КОЛОНОК (С ПРОЗРАЧНОСТЬЮ И ПЕРЕКРЫТИЕМ) --- */
+
+/* Контейнер таблицы с горизонтальным скроллом */
+.tableWrapper {
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: 500px;
+  position: relative;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Таблица */
+.attendanceTable {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 4px;
+  font-size: 12px;
+  min-width: 600px;
+}
+
+/* --- ФИКСИРОВАННЫЕ КОЛОНКИ С ПРОЗРАЧНОСТЬЮ --- */
+
+/* Колонка "№" - фиксируется слева */
+.attendanceTable .stickyCol {
+  position: sticky !important;
+  left: 0 !important;
+  z-index: 10 !important;
+  background: rgba(255, 255, 255, 0.92) !important;
+  backdrop-filter: blur(4px) !important;
+  -webkit-backdrop-filter: blur(4px) !important;
+  min-width: 40px !important;
+  max-width: 40px !important;
+  width: 40px !important;
+  text-align: center !important;
+  border-right: 2px solid rgba(209, 213, 219, 0.5) !important;
+  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Колонка "ФИО студента" - фиксируется слева после "№" */
+.attendanceTable .stickyColName {
+  position: sticky !important;
+  left: 40px !important;
+  z-index: 10 !important;
+  background: rgba(255, 255, 255, 0.92) !important;
+  backdrop-filter: blur(4px) !important;
+  -webkit-backdrop-filter: blur(4px) !important;
+  min-width: 150px !important;
+  max-width: 220px !important;
+  width: 180px !important;
+  padding-right: 12px !important;
+  border-right: 2px solid rgba(209, 213, 219, 0.5) !important;
+  box-shadow: 2px 0 12px rgba(0, 0, 0, 0.06) !important;
+  text-align: left !important;
+}
+
+/* Заголовки фиксированных колонок - выше остальных */
+.attendanceTable thead .stickyCol,
+.attendanceTable thead .stickyColName {
+  z-index: 20 !important;
+  background: rgba(241, 245, 249, 0.92) !important;
+  backdrop-filter: blur(4px) !important;
+  -webkit-backdrop-filter: blur(4px) !important;
+  border-bottom: 2px solid rgba(148, 163, 184, 0.4) !important;
+}
+
+/* Строки с фиксированными колонками */
+.attendanceTable tbody .stickyCol,
+.attendanceTable tbody .stickyColName {
+  background: rgba(255, 255, 255, 0.92) !important;
+  backdrop-filter: blur(4px) !important;
+  -webkit-backdrop-filter: blur(4px) !important;
+}
+
+/* При наведении на строку - чуть более плотные */
+.attendanceTable tbody tr:hover .stickyCol,
+.attendanceTable tbody tr:hover .stickyColName {
+  background: rgba(248, 250, 252, 0.95) !important;
+}
+
+/* --- ОСТАЛЬНЫЕ КОЛОНКИ (прокручиваются) --- */
+
+/* Обычные ячейки */
+.attendanceTable td:not(.stickyCol):not(.stickyColName),
+.attendanceTable th:not(.stickyCol):not(.stickyColName) {
+  background: rgba(255, 255, 255, 0.4) !important;
+  min-width: 50px !important;
+  white-space: nowrap !important;
+}
+
+/* --- ЗАГОЛОВКИ ДНЕЙ НЕДЕЛИ И ДАТ (БОЛЕЕ ТЁМНЫЕ) --- */
+
+/* Заголовки дней недели - более тёмные */
+.attendanceTable thead th:not(.stickyCol):not(.stickyColName) {
+  background: rgba(241, 245, 249, 0.4) !important;
+  color: #1e293b !important; /* Тёмный цвет вместо серого */
+  font-weight: 600 !important;
+  border-bottom: 1px solid rgba(203, 213, 225, 0.3) !important;
+  padding: 6px 6px !important;
+  text-align: center !important;
+  font-size: 11px !important;
+}
+
+/* Даты под днями недели - более тёмные */
+.attendanceTable thead th:not(.stickyCol):not(.stickyColName) .dateSmall {
+  color: #475569 !important; /* Тёмно-серый вместо светлого */
+  opacity: 1 !important; /* Полная видимость */
+  font-size: 10px !important;
+  font-weight: 500 !important;
+}
+
+/* Альтернативный вариант - если .dateSmall не внутри th */
+.dateSmall {
+  color: #475569 !important;
+  opacity: 1 !important;
+  font-size: 10px !important;
+  font-weight: 500 !important;
+}
+
+/* Итоговые колонки (Всего, Уваж., Неуваж.) - более тёмные */
+.attendanceTable thead th:nth-last-child(-n+3) {
+  color: #1e293b !important;
+  font-weight: 600 !important;
+  font-size: 10px !important;
+  background: rgba(241, 245, 249, 0.3) !important;
+}
+
+/* Ячейки с данными - чуть темнее */
+.attendanceTable tbody td:not(.stickyCol):not(.stickyColName) {
+  color: #334155 !important; /* Тёмно-серый вместо очень светлого */
+  font-size: 12px !important;
+  background: rgba(255, 255, 255, 0.3) !important;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.25) !important;
+}
+
+/* Итоговые ячейки (Всего, Уваж., Неуваж.) */
+.attendanceTable tbody td:nth-last-child(-n+3) {
+  color: #334155 !important;
+  font-weight: 500 !important;
+  background: rgba(248, 250, 252, 0.25) !important;
+}
+
+/* При наведении на строку */
+.attendanceTable tbody tr:hover td:not(.stickyCol):not(.stickyColName) {
+  background: rgba(255, 255, 255, 0.35) !important;
+}
+
+/* --- КНОПКИ ДЕЙСТВИЙ --- */
+.tableActions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.reportBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 20px;
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #22c55e;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.reportBtn:hover {
+  background: rgba(34, 197, 94, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(34, 197, 94, 0.2);
+}
+
+.reportBtn svg {
+  stroke: #22c55e;
+}
+
+.downloadBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 20px;
+  background: rgba(10, 132, 255, 0.1);
+  border: 1px solid rgba(10, 132, 255, 0.2);
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #0A84FF;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.downloadBtn:hover {
+  background: rgba(10, 132, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(10, 132, 255, 0.2);
+}
+
+.downloadBtn svg {
+  stroke: #0A84FF;
+}
+
+@media (max-width: 768px) {
+  .tableActions {
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+  }
+  
+  .reportBtn,
+  .downloadBtn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+/* --- КНОПКИ ДЕЙСТВИЙ --- */
+.tableActions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.reportBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 20px;
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #22c55e;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.reportBtn:hover {
+  background: rgba(34, 197, 94, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(34, 197, 94, 0.2);
+}
+
+.reportBtn svg {
+  stroke: #22c55e;
+}
+
+.downloadBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 20px;
+  background: rgba(10, 132, 255, 0.1);
+  border: 1px solid rgba(10, 132, 255, 0.2);
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #0A84FF;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.downloadBtn:hover {
+  background: rgba(10, 132, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(10, 132, 255, 0.2);
+}
+
+.downloadBtn svg {
+  stroke: #0A84FF;
+}
+
+@media (max-width: 768px) {
+  .tableActions {
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+  }
+  
+  .reportBtn,
+  .downloadBtn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* --- ЦВЕТНЫЕ БЕЙДЖИ ДЛЯ УВАЖ. И НЕУВАЖ. --- */
+.respectedBadge {
+  display: inline-block;
+  padding: 2px 10px;
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 12px;
+  min-width: 30px;
+  text-align: center;
+}
+
+.notRespectedBadge {
+  display: inline-block;
+  padding: 2px 10px;
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 12px;
+  min-width: 30px;
+  text-align: center;
+}
+
+/* Центрирование всех ячеек */
+.attendanceTable td {
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
+/* --- КАСТОМНОЕ МОДАЛЬНОЕ ОКНО ДЛЯ ПОДТВЕРЖДЕНИЯ --- */
+.confirmModalContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 10px 0;
+}
+
+.confirmText {
+  font-size: 16px;
+  color: #1e293b;
+  text-align: center;
+  line-height: 1.6;
+  margin: 0;
+  font-weight: 500;
+}
+
+.confirmButtons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  width: 100%;
+}
+
+.confirmCancelBtn {
+  padding: 10px 30px;
+  background: rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.confirmCancelBtn:hover {
+  background: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+}
+
+.confirmDeleteBtn {
+  padding: 10px 30px;
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #ef4444;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.confirmDeleteBtn:hover {
+  background: rgba(239, 68, 68, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.15);
+}
+
+// Добавьте эти стили в ваш файл groupAttendance.module.scss
+
+// Контейнер для таблицы с ограничением высоты и скроллом
+.tableScrollContainer {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.tableWrapper {
+  flex: 1;
+  overflow: auto;
+  position: relative;
+  
+  // Стили для скроллбара
+  &::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 10px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: #0A84FF;
+    border-radius: 10px;
+  }
+  
+  &::-webkit-scrollbar-thumb:hover {
+    background: #0066cc;
+  }
+}
+
+// Сам контейнер секции с таблицей
+.tableSection {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  border-radius: 24px;
+  padding: 24px 28px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+  height: 100%;
+}
+
+// Обертка контента (сайдбар + таблица)
+.contentWrapper {
+  display: flex;
+  gap: 28px;
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+  padding-bottom: 20px;
+}
+
+// Главный контейнер
+.mainContainer {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 20px 32px 10px 32px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+// Адаптация для разных размеров экрана
+@media (max-width: 1200px) {
+  .mainContainer {
+    padding: 16px 20px 10px 20px;
+  }
+  
+  .contentWrapper {
+    gap: 16px;
+  }
+  
+  .tableSection {
+    padding: 16px 18px;
+  }
+}
+
+@media (max-width: 768px) {
+  .contentWrapper {
+    flex-direction: column;
+  }
+  
+  .sidebar {
+    flex-shrink: 0;
+  }
+  
+  .tableSection {
+    min-height: 400px;
+  }
+}

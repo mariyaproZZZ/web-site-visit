@@ -47,6 +47,16 @@ interface Discipline {
   groupId: number;
 }
 
+interface Notification {
+  id: string;
+  title: string;
+  description: string;
+  time: string;
+  read: boolean;
+  type?: string;
+  data?: any;
+}
+
 const avatarColors = [
   '#0A84FF',
   '#22c55e',
@@ -136,6 +146,7 @@ export const MainStudent: React.FC = () => {
   const [attendance, setAttendance] = useState<AttendanceRecord[]>([]);
   const [schedule, setSchedule] = useState<ScheduleItem[]>([]);
   const [disciplines, setDisciplines] = useState<Discipline[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [currentWeekStart, setCurrentWeekStart] = useState<Date>(() => {
     const now = new Date();
     const day = now.getDay();
@@ -144,22 +155,19 @@ export const MainStudent: React.FC = () => {
   });
   const [attendanceView, setAttendanceView] = useState<'week' | 'month'>('week');
   const [attendanceOffset, setAttendanceOffset] = useState(0);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success');
+  const [toastTimeout, setToastTimeout] = useState<number | null>(null);
+  
+  // Храним ID опросов, по которым уже было отправлено уведомление (НЕЗАВИСИМО ОТ СТАТУСА)
+  const [notifiedPollIds, setNotifiedPollIds] = useState<Set<string>>(new Set());
 
-  // Таймер для обновления опросов
+  // Таймер для обновления опросов и уведомлений КАЖДЫЕ 5 СЕКУНД
   useEffect(() => {
     const interval = setInterval(() => {
-      // Обновляем список опросов, проверяя истекшие
-      setPolls(prevPolls => 
-        prevPolls.map(poll => {
-          const now = Date.now();
-          const expiresAt = new Date(poll.expiresAt).getTime();
-          if (poll.active && now > expiresAt) {
-            return { ...poll, active: false };
-          }
-          return poll;
-        })
-      );
-    }, 30000); // Проверяем каждые 30 секунд
+      fetchAllData();
+    }, 5000);
 
     return () => clearInterval(interval);
   }, []);
@@ -169,34 +177,109 @@ export const MainStudent: React.FC = () => {
   }, [selectedColor]);
 
   useEffect(() => {
-    fetchData();
+    fetchAllData();
   }, []);
 
-  const fetchData = async () => {
+  const fetchAllData = async () => {
     try {
-      const [pollsRes, attendanceRes, scheduleRes, disciplinesRes] = await Promise.all([
+      const [pollsRes, notificationsRes, attendanceRes, scheduleRes, disciplinesRes] = await Promise.all([
         fetch('/api/polls'),
-        fetch('/api/attendance?studentId=1'),
+        fetch('/api/notifications'),
+        fetch(`/api/attendance?studentId=${user?.id || '1'}`),
         fetch('/api/schedule'),
         fetch('/api/disciplines')
       ]);
       
       const pollsData = await pollsRes.json();
+      const notificationsData = await notificationsRes.json();
       const attendanceData = await attendanceRes.json();
       const scheduleData = await scheduleRes.json();
       const disciplinesData = await disciplinesRes.json();
       
-      console.log('=== ДАННЫЕ ИЗ БД ===');
-      console.log('Disciplines:', disciplinesData);
-      console.log('Schedule:', scheduleData);
+      // Обновляем данные
+      setPolls(Array.isArray(pollsData) ? pollsData : []);
+      setAttendance(Array.isArray(attendanceData) ? attendanceData : []);
+      setSchedule(Array.isArray(scheduleData) ? scheduleData : []);
+      setDisciplines(Array.isArray(disciplinesData) ? disciplinesData : []);
       
-      setPolls(pollsData);
-      setAttendance(attendanceData);
-      setSchedule(scheduleData);
-      setDisciplines(disciplinesData);
+      // --- ЛОГИКА УВЕДОМЛЕНИЙ О НОВЫХ ОПРОСАХ ---
+      const activePolls = Array.isArray(pollsData) ? pollsData.filter((p: Poll) => p.active) : [];
+      const today = new Date().toISOString().split('T')[0];
+      const studentId = parseInt(user?.id || '0');
+      
+      // Проверяем каждый активный опрос
+      activePolls.forEach((poll: Poll) => {
+        // Проверяем, отметился ли студент на этот опрос сегодня
+        const isMarked = attendanceData.some(
+          (a: AttendanceRecord) => 
+            a.studentId === studentId && 
+            a.disciplineId === poll.disciplineId && 
+            a.date === today
+        );
+        
+        // Если студент НЕ отметился И уведомление еще не было отправлено
+        if (!isMarked && !notifiedPollIds.has(poll.id)) {
+          const disciplineName = getDisciplineNameFromList(poll.disciplineId, disciplinesData);
+          
+          // Показываем тост
+          showToastNotification(`Новый опрос по "${disciplineName}"!`, 'info');
+          
+          // Добавляем уведомление в список (ТОЛЬКО ОДИН РАЗ)
+          const newNotification: Notification = {
+            id: `poll_${poll.id}`,
+            title: 'Новый опрос по посещаемости',
+            description: `Преподаватель начал опрос по предмету "${disciplineName}"`,
+            time: new Date().toISOString(),
+            read: false,
+            type: 'poll_started',
+            data: { disciplineId: poll.disciplineId, pollId: poll.id }
+          };
+          
+          setNotifications(prev => {
+            // Проверяем, нет ли уже такого уведомления
+            const exists = prev.some(n => n.id === `poll_${poll.id}`);
+            if (exists) return prev;
+            return [newNotification, ...prev];
+          });
+          
+          // Добавляем ID опроса в список уведомленных
+          setNotifiedPollIds(prev => new Set(prev).add(poll.id));
+        }
+      });
+      
     } catch (error) {
       console.error('Ошибка загрузки данных:', error);
     }
+  };
+
+  // Вспомогательная функция для получения названия дисциплины из списка
+  const getDisciplineNameFromList = (id: number, disciplinesList: Discipline[]): string => {
+    const disc = disciplinesList.find((d: Discipline) => d.id === id);
+    if (disc) return disc.name;
+    return FALLBACK_DISCIPLINES[id] || 'Неизвестно';
+  };
+
+  const fetchAttendance = async () => {
+    try {
+      const response = await fetch(`/api/attendance?studentId=${user?.id || '1'}`);
+      const data = await response.json();
+      setAttendance(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error('Ошибка загрузки посещаемости:', error);
+    }
+  };
+
+  const showToastNotification = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
+    if (toastTimeout) {
+      clearTimeout(toastTimeout);
+    }
+    setToastMessage(message);
+    setToastType(type);
+    setShowToast(true);
+    const timeout = window.setTimeout(() => {
+      setShowToast(false);
+    }, 4000);
+    setToastTimeout(timeout);
   };
 
   const getDisciplineName = (id: number): string => {
@@ -227,7 +310,7 @@ export const MainStudent: React.FC = () => {
         scheduleMap.get(key)!.push(item);
       });
     
-    for (const [day, items] of scheduleMap) {
+    for (const items of scheduleMap.values()) {
       items.sort((a: ScheduleItem, b: ScheduleItem) => a.time.localeCompare(b.time));
     }
     
@@ -250,9 +333,10 @@ export const MainStudent: React.FC = () => {
       endDate = new Date(now.getFullYear(), now.getMonth() + attendanceOffset + 1, 0);
     }
     
+    const studentId = parseInt(user?.id || '0');
     return attendance.filter(record => {
       const recordDate = new Date(record.date);
-      return recordDate >= startDate && recordDate <= endDate;
+      return record.studentId === studentId && recordDate >= startDate && recordDate <= endDate;
     });
   };
 
@@ -311,6 +395,7 @@ export const MainStudent: React.FC = () => {
           setUploadedFiles(updatedFiles);
           localStorage.setItem('portfolioFiles', JSON.stringify(updatedFiles));
           setIsUploading(false);
+          showToastNotification('Файлы успешно загружены!', 'success');
         }
       };
       reader.readAsDataURL(file);
@@ -328,11 +413,56 @@ export const MainStudent: React.FC = () => {
     const updatedFiles = uploadedFiles.filter((_, i) => i !== index);
     setUploadedFiles(updatedFiles);
     localStorage.setItem('portfolioFiles', JSON.stringify(updatedFiles));
+    showToastNotification('Файл удален', 'info');
   };
 
   const handleLogout = () => {
     logout();
     navigate('/login');
+  };
+
+  const handleMarkAttendance = async (poll: Poll) => {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      
+      const alreadyMarked = attendance.some(
+        a => a.studentId === parseInt(user?.id || '0') && 
+             a.disciplineId === poll.disciplineId && 
+             a.date === today
+      );
+      
+      if (alreadyMarked) {
+        showToastNotification('Вы уже отметились на этом опросе!', 'error');
+        return;
+      }
+
+      const response = await fetch('/api/attendance', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          studentId: parseInt(user?.id || '0'),
+          disciplineId: poll.disciplineId,
+          date: today,
+          status: 'П'
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Ошибка при отметке');
+      }
+      
+      const newRecord = await response.json();
+      setAttendance(prev => [...prev, newRecord]);
+      
+      const disciplineName = getDisciplineName(poll.disciplineId);
+      showToastNotification(`Вы успешно отметились на опросе по "${disciplineName}"!`, 'success');
+      
+      await fetchAttendance();
+      
+    } catch (error) {
+      console.error('Ошибка отметки:', error);
+      showToastNotification('Не удалось отметиться. Попробуйте позже.', 'error');
+    }
   };
 
   const weekDays = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
@@ -343,7 +473,6 @@ export const MainStudent: React.FC = () => {
     { time: '12:45-14:15', subject: 'Физика', type: 'Лекция', room: 'Ауд. 301' },
   ];
 
-  // Фильтруем только активные опросы, у которых время еще не истекло
   const activePolls = polls.filter(p => {
     if (!p.active) return false;
     const now = Date.now();
@@ -353,6 +482,40 @@ export const MainStudent: React.FC = () => {
   
   const attendanceRecords = getAttendanceForPeriod();
   const scheduleMap = getScheduleForWeek(currentWeekStart);
+  
+  // Количество непрочитанных уведомлений
+  const unreadCount = notifications.filter(n => !n.read).length;
+
+  const formatTime = (time: string) => {
+    const now = new Date();
+    const notifTime = new Date(time);
+    const diffMs = now.getTime() - notifTime.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffMins < 1) return 'Только что';
+    if (diffMins < 60) {
+      if (diffMins === 1) return '1 минуту назад';
+      if (diffMins < 5) return diffMins + ' минуты назад';
+      return diffMins + ' минут назад';
+    }
+    if (diffHours < 24) {
+      if (diffHours === 1) return '1 час назад';
+      if (diffHours < 5) return diffHours + ' часа назад';
+      return diffHours + ' часов назад';
+    }
+    if (diffDays === 1) return 'Вчера';
+    if (diffDays < 5) return diffDays + ' дня назад';
+    return diffDays + ' дней назад';
+  };
+
+  // Функция для отметки уведомления как прочитанного
+  const markAsRead = (id: string) => {
+    setNotifications(prev =>
+      prev.map(n => n.id === id ? { ...n, read: true } : n)
+    );
+  };
 
   return (
     <div className={styles.pageWrapper}>
@@ -397,7 +560,9 @@ export const MainStudent: React.FC = () => {
                   <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
                 </svg>
                 Уведомления
-                <span className={styles.notificationBadge}>{activePolls.length}</span>
+                {unreadCount > 0 && (
+                  <span className={styles.notificationBadge}>{unreadCount}</span>
+                )}
               </button>
               <button className={`${styles.navBtn} ${styles.logoutBtn}`} onClick={handleLogout}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -484,7 +649,6 @@ export const MainStudent: React.FC = () => {
                 <div className={styles.pollList}>
                   {activePolls.map(poll => {
                     const timeLeft = Math.max(0, Math.floor((new Date(poll.expiresAt).getTime() - Date.now()) / 60000));
-                    // Получаем название дисциплины из списка disciplines
                     const disciplineName = getDisciplineName(poll.disciplineId);
                     const isMarked = attendance.some(
                       a => a.studentId === parseInt(user?.id || '0') && 
@@ -521,27 +685,7 @@ export const MainStudent: React.FC = () => {
                           ) : (
                             <button 
                               className={styles.pollMarkBtn}
-                              onClick={async () => {
-                                try {
-                                  const today = new Date().toISOString().split('T')[0];
-                                  const response = await fetch('/api/attendance', {
-                                    method: 'POST',
-                                    headers: { 'Content-Type': 'application/json' },
-                                    body: JSON.stringify({
-                                      studentId: parseInt(user?.id || '0'),
-                                      disciplineId: poll.disciplineId,
-                                      date: today,
-                                      status: 'П'
-                                    })
-                                  });
-                                  const newRecord = await response.json();
-                                  setAttendance(prev => [...prev, newRecord]);
-                                  alert('Вы успешно отметились на опросе!');
-                                } catch (error) {
-                                  console.error('Ошибка отметки:', error);
-                                  alert('Не удалось отметиться. Попробуйте позже.');
-                                }
-                              }}
+                              onClick={() => handleMarkAttendance(poll)}
                             >
                               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                 <path d="M20 14.66V20a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h5.34"/>
@@ -562,6 +706,34 @@ export const MainStudent: React.FC = () => {
           </div>
         </div>
       </main>
+
+      {/* ТОСТ УВЕДОМЛЕНИЙ */}
+      <div className={`${styles.toast} ${showToast ? styles.toastShow : ''}`}>
+        <div className={`${styles.toastContent} ${toastType === 'success' ? styles.toastSuccess : toastType === 'error' ? styles.toastError : styles.toastInfo}`}>
+          <div className={styles.toastIcon}>
+            {toastType === 'success' && (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            )}
+            {toastType === 'error' && (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="15" y1="9" x2="9" y2="15"/>
+                <line x1="9" y1="9" x2="15" y2="15"/>
+              </svg>
+            )}
+            {toastType === 'info' && (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0A84FF" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 8v8"/>
+                <path d="M12 16h.01"/>
+              </svg>
+            )}
+          </div>
+          <span className={styles.toastText}>{toastMessage}</span>
+        </div>
+      </div>
 
       <footer className={styles.footer}>
         <div className={styles.footerInner}>
@@ -612,30 +784,47 @@ export const MainStudent: React.FC = () => {
         </div>
       </footer>
 
-      {/* Модалка: Уведомления */}
+      {/* Модалка: Уведомления - обновлена как у преподавателя */}
       <Modal isOpen={showNotifications} onClose={() => setShowNotifications(false)} title="Уведомления">
         <div className={styles.notificationsList}>
-          {activePolls.length > 0 ? (
-            activePolls.map(poll => {
-              const disciplineName = getDisciplineName(poll.disciplineId);
-              return (
-                <div key={poll.id} className={styles.notificationItem}>
+          {notifications.length === 0 ? (
+            <div className={styles.notificationsEmpty}>
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+              </svg>
+              <span>Нет уведомлений</span>
+            </div>
+          ) : (
+            <>
+              <div className={styles.notificationsHeader}>
+                <span className={styles.notificationsCount}>
+                  Всего: {notifications.length} {unreadCount > 0 && `(${unreadCount} новых)`}
+                </span>
+                <button className={styles.clearAllBtn} onClick={() => setNotifications([])}>
+                  Очистить все
+                </button>
+              </div>
+              {notifications.map(notif => (
+                <div 
+                  key={notif.id} 
+                  className={`${styles.notificationItem} ${!notif.read ? styles.unread : ''}`}
+                  onClick={() => markAsRead(notif.id)}
+                >
                   <div className={styles.notificationIcon}>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0A84FF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                      <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                      <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
                     </svg>
                   </div>
                   <div className={styles.notificationContent}>
-                    <div className={styles.notificationTitle}>Новый опрос по посещаемости</div>
-                    <div className={styles.notificationDesc}>Преподаватель начал опрос по предмету "{disciplineName}"</div>
-                    <div className={styles.notificationTime}>Осталось {Math.max(0, Math.floor((new Date(poll.expiresAt).getTime() - Date.now()) / 60000))} минут</div>
+                    <div className={styles.notificationTitle}>{notif.title}</div>
+                    <div className={styles.notificationDesc}>{notif.description}</div>
+                    <div className={styles.notificationTime}>{formatTime(notif.time)}</div>
                   </div>
                 </div>
-              );
-            })
-          ) : (
-            <div className={styles.notificationsEmpty}>Уведомлений нет</div>
+              ))}
+            </>
           )}
         </div>
       </Modal>
@@ -826,23 +1015,24 @@ export const MainStudent: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {attendanceRecords.map((record, index) => (
-                  <tr key={index}>
-                    <td>{getDisciplineName(record.disciplineId)}</td>
-                    <td>{new Date(record.date).toLocaleDateString('ru-RU')}</td>
-                    <td>
-                      <span className={`${styles.statusBadge} ${record.status === 'P' ? styles.statusPresent : styles.statusAbsent}`}>
-                        {record.status === 'P' ? 'Присутствовал' : 'Отсутствовал'}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-                {attendanceRecords.length === 0 && (
+                {attendanceRecords.length === 0 ? (
                   <tr>
                     <td colSpan={3} style={{ textAlign: 'center', padding: '20px', color: '#94a3b8' }}>
                       За этот период записей нет
                     </td>
                   </tr>
+                ) : (
+                  attendanceRecords.map((record, index) => (
+                    <tr key={index}>
+                      <td>{getDisciplineName(record.disciplineId)}</td>
+                      <td>{new Date(record.date).toLocaleDateString('ru-RU')}</td>
+                      <td>
+                        <span className={`${styles.statusBadge} ${record.status === 'П' ? styles.statusPresent : styles.statusAbsent}`}>
+                          {record.status === 'П' ? 'Присутствовал' : 'Отсутствовал'}
+                        </span>
+                      </td>
+                    </tr>
+                  ))
                 )}
               </tbody>
             </table>

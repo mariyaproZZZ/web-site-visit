@@ -30,6 +30,16 @@ interface Discipline {
   groupId: number;
 }
 
+interface Notification {
+  id: string;
+  title: string;
+  description: string;
+  time: string;
+  read: boolean;
+  type?: string;
+  data?: any;
+}
+
 // --- КОМПОНЕНТ ПОДСКАЗКИ ДЛЯ ФУТЕРА ---
 const FooterTooltip: React.FC<{ text: string; children: React.ReactNode }> = ({ text, children }) => {
   const [isVisible, setIsVisible] = useState(false);
@@ -90,6 +100,10 @@ export const MainTeacher: React.FC = () => {
   const [pollSecondsLeft, setPollSecondsLeft] = useState(0);
   const [pollTimer, setPollTimer] = useState<ReturnType<typeof setInterval> | null>(null);
   const [isPollEnding, setIsPollEnding] = useState(false);
+  
+  // Состояние для уведомлений
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [notifiedPollIds, setNotifiedPollIds] = useState<Set<string>>(new Set());
 
   // Состояние для цвета аватарки
   const [selectedColor, setSelectedColor] = useState(() => {
@@ -247,6 +261,39 @@ export const MainTeacher: React.FC = () => {
       }) : [];
       
       setPolls(pollsWithNames);
+      
+      // --- ЛОГИКА УВЕДОМЛЕНИЙ О НОВЫХ ОПРОСАХ ---
+      const activePolls = Array.isArray(pollsWithNames) ? pollsWithNames.filter((p: Poll) => p.active) : [];
+      
+      // Проверяем каждый активный опрос
+      activePolls.forEach((poll: Poll) => {
+        // Если уведомление еще не было отправлено
+        if (!notifiedPollIds.has(poll.id)) {
+          const disciplineName = poll.disciplineName || 'Неизвестно';
+          
+          // Добавляем уведомление в список
+          const newNotification: Notification = {
+            id: `poll_${poll.id}`,
+            title: 'Новый опрос начат',
+            description: `Вы начали опрос по предмету "${disciplineName}"`,
+            time: new Date().toISOString(),
+            read: false,
+            type: 'poll_started',
+            data: { disciplineId: poll.disciplineId, pollId: poll.id }
+          };
+          
+          setNotifications(prev => {
+            // Проверяем, нет ли уже такого уведомления
+            const exists = prev.some(n => n.id === `poll_${poll.id}`);
+            if (exists) return prev;
+            return [newNotification, ...prev];
+          });
+          
+          // Добавляем ID опроса в список уведомленных
+          setNotifiedPollIds(prev => new Set(prev).add(poll.id));
+        }
+      });
+      
     } catch (error) {
       console.error('Ошибка загрузки опросов:', error);
       setPolls([]);
@@ -296,6 +343,40 @@ export const MainTeacher: React.FC = () => {
     return disc ? disc.name : 'Неизвестно';
   };
 
+  // Количество непрочитанных уведомлений
+  const unreadCount = notifications.filter(n => !n.read).length;
+
+  // Функция для отметки уведомления как прочитанного
+  const markAsRead = (id: string) => {
+    setNotifications(prev =>
+      prev.map(n => n.id === id ? { ...n, read: true } : n)
+    );
+  };
+
+  const formatTime = (time: string) => {
+    const now = new Date();
+    const notifTime = new Date(time);
+    const diffMs = now.getTime() - notifTime.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffMins < 1) return 'Только что';
+    if (diffMins < 60) {
+      if (diffMins === 1) return '1 минуту назад';
+      if (diffMins < 5) return diffMins + ' минуты назад';
+      return diffMins + ' минут назад';
+    }
+    if (diffHours < 24) {
+      if (diffHours === 1) return '1 час назад';
+      if (diffHours < 5) return diffHours + ' часа назад';
+      return diffHours + ' часов назад';
+    }
+    if (diffDays === 1) return 'Вчера';
+    if (diffDays < 5) return diffDays + ' дня назад';
+    return diffDays + ' дней назад';
+  };
+
   return (
     <div className={styles.pageWrapper}>
       <BackgroundCircles />
@@ -342,7 +423,9 @@ export const MainTeacher: React.FC = () => {
                   <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
                 </svg>
                 Уведомления
-                <span className={styles.notificationBadge}>0</span>
+                {unreadCount > 0 && (
+                  <span className={styles.notificationBadge}>{unreadCount}</span>
+                )}
               </button>
               <button className={`${styles.navBtn} ${styles.logoutBtn}`} onClick={handleLogout}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -487,17 +570,52 @@ export const MainTeacher: React.FC = () => {
         </div>
       </footer>
 
+      {/* Модалка: Уведомления */}
       <Modal isOpen={showNotifications} onClose={() => setShowNotifications(false)} title="Уведомления">
-        <div className={styles.notificationsEmpty}>
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-          </svg>
-          <span>Нет уведомлений</span>
+        <div className={styles.notificationsList}>
+          {notifications.length === 0 ? (
+            <div className={styles.notificationsEmpty}>
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+              </svg>
+              <span>Нет уведомлений</span>
+            </div>
+          ) : (
+            <>
+              <div className={styles.notificationsHeader}>
+                <span className={styles.notificationsCount}>
+                  Всего: {notifications.length} {unreadCount > 0 && `(${unreadCount} новых)`}
+                </span>
+                <button className={styles.clearAllBtn} onClick={() => setNotifications([])}>
+                  Очистить все
+                </button>
+              </div>
+              {notifications.map(notif => (
+                <div 
+                  key={notif.id} 
+                  className={`${styles.notificationItem} ${!notif.read ? styles.unread : ''}`}
+                  onClick={() => markAsRead(notif.id)}
+                >
+                  <div className={styles.notificationIcon}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0A84FF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                      <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                    </svg>
+                  </div>
+                  <div className={styles.notificationContent}>
+                    <div className={styles.notificationTitle}>{notif.title}</div>
+                    <div className={styles.notificationDesc}>{notif.description}</div>
+                    <div className={styles.notificationTime}>{formatTime(notif.time)}</div>
+                  </div>
+                </div>
+              ))}
+            </>
+          )}
         </div>
       </Modal>
 
-      {/* МОДАЛКА ПРОФИЛЯ - полная как у студента */}
+      {/* МОДАЛКА ПРОФИЛЯ */}
       <Modal isOpen={showProfile} onClose={() => setShowProfile(false)} title="Профиль">
         <div className={styles.profileContent}>
           <div className={styles.profileAvatar}>

@@ -680,6 +680,16 @@
       "active": false,
       "disciplineName": "Высшая математика",
       "id": "CqtAlfbjXpY"
+    },
+    {
+      "disciplineId": "1",
+      "teacherId": 1,
+      "groupId": 1,
+      "startedAt": "2026-06-24T14:17:44.378Z",
+      "expiresAt": "2026-06-24T14:32:44.378Z",
+      "active": false,
+      "disciplineName": "Высшая математика",
+      "id": "d9P-cbQqrRY"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

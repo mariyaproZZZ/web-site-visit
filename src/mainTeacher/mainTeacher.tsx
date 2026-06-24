@@ -13,11 +13,21 @@ interface Group {
   disciplineCount: number;
 }
 
-interface Notification {
+interface Poll {
   id: string;
-  title: string;
-  description: string;
-  time: string;
+  disciplineId: number;
+  disciplineName: string;
+  teacherId: number;
+  groupId: number;
+  startedAt: string;
+  expiresAt: string;
+  active: boolean;
+}
+
+interface Discipline {
+  id: number;
+  name: string;
+  groupId: number;
 }
 
 // --- КОМПОНЕНТ ПОДСКАЗКИ ДЛЯ ФУТЕРА ---
@@ -54,6 +64,18 @@ const FooterTooltip: React.FC<{ text: string; children: React.ReactNode }> = ({ 
   );
 };
 
+// Цвета для аватарки
+const avatarColors = [
+  '#0A84FF',
+  '#22c55e',
+  '#ef4444',
+  '#eab308',
+  '#8b5cf6',
+  '#ec4899'
+];
+
+const AVATAR_COLOR_KEY = 'avatarColor';
+
 export const MainTeacher: React.FC = () => {
   const navigate = useNavigate();
   const user = getUser();
@@ -62,6 +84,23 @@ export const MainTeacher: React.FC = () => {
   const [showProfile, setShowProfile] = useState(false);
   const [groups, setGroups] = useState<Group[]>([]);
   const [loading, setLoading] = useState(true);
+  const [polls, setPolls] = useState<Poll[]>([]);
+  const [disciplines, setDisciplines] = useState<Discipline[]>([]);
+  const [pollTimeLeft, setPollTimeLeft] = useState(0);
+  const [pollSecondsLeft, setPollSecondsLeft] = useState(0);
+  const [pollTimer, setPollTimer] = useState<ReturnType<typeof setInterval> | null>(null);
+  const [isPollEnding, setIsPollEnding] = useState(false);
+
+  // Состояние для цвета аватарки
+  const [selectedColor, setSelectedColor] = useState(() => {
+    const savedColor = localStorage.getItem(AVATAR_COLOR_KEY);
+    return savedColor && avatarColors.includes(savedColor) ? savedColor : avatarColors[0];
+  });
+
+  // Сохраняем цвет аватарки в localStorage
+  React.useEffect(() => {
+    localStorage.setItem(AVATAR_COLOR_KEY, selectedColor);
+  }, [selectedColor]);
 
   const tagColors = [
     '#0A84FF',
@@ -74,14 +113,72 @@ export const MainTeacher: React.FC = () => {
 
   useEffect(() => {
     fetchGroups();
+    fetchPolls();
+    fetchDisciplines();
+    
+    const pollInterval = setInterval(fetchPolls, 5000);
+    
+    return () => {
+      clearInterval(pollInterval);
+      if (pollTimer) clearInterval(pollTimer);
+    };
   }, []);
+
+  useEffect(() => {
+    const activePoll = polls.find(p => p.active);
+    if (activePoll) {
+      const expiresAt = new Date(activePoll.expiresAt).getTime();
+      const now = Date.now();
+      const leftSeconds = Math.max(0, Math.floor((expiresAt - now) / 1000));
+      const leftMinutes = Math.floor(leftSeconds / 60);
+      setPollTimeLeft(leftMinutes);
+      setPollSecondsLeft(leftSeconds % 60);
+      
+      if (pollTimer) {
+        clearInterval(pollTimer);
+      }
+      
+      const timer = setInterval(() => {
+        const now2 = Date.now();
+        const leftSec = Math.max(0, Math.floor((expiresAt - now2) / 1000));
+        
+        if (leftSec <= 0) {
+          clearInterval(timer);
+          setPollTimeLeft(0);
+          setPollSecondsLeft(0);
+          setIsPollEnding(true);
+          setTimeout(() => {
+            fetchPolls();
+            setIsPollEnding(false);
+          }, 500);
+          return;
+        }
+        
+        setPollTimeLeft(Math.floor(leftSec / 60));
+        setPollSecondsLeft(leftSec % 60);
+      }, 1000);
+      
+      setPollTimer(timer);
+      
+      return () => {
+        if (timer) clearInterval(timer);
+      };
+    } else {
+      if (pollTimer) {
+        clearInterval(pollTimer);
+        setPollTimer(null);
+      }
+      setPollTimeLeft(0);
+      setPollSecondsLeft(0);
+      setIsPollEnding(false);
+    }
+  }, [polls]);
 
   const fetchGroups = async () => {
     try {
       const response = await fetch('/api/groups');
       const data = await response.json();
       
-      // Получаем статистику для каждой группы
       const groupsWithStats = await Promise.all(data.map(async (group: any) => {
         try {
           const studentsRes = await fetch(`/api/students?groupId=${group.id}`);
@@ -107,7 +204,6 @@ export const MainTeacher: React.FC = () => {
       setGroups(groupsWithStats);
     } catch (error) {
       console.error('Ошибка загрузки групп:', error);
-      // Тестовые данные
       setGroups([
         { id: '1', name: 'ИС-21', teacherId: '1', studentCount: 4, disciplineCount: 5 },
         { id: '2', name: 'ИС-22', teacherId: '1', studentCount: 3, disciplineCount: 3 },
@@ -116,6 +212,38 @@ export const MainTeacher: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchPolls = async () => {
+    try {
+      const response = await fetch('/api/polls');
+      const data = await response.json();
+      setPolls(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error('Ошибка загрузки опросов:', error);
+      setPolls([]);
+    }
+  };
+
+  const fetchDisciplines = async () => {
+    try {
+      const response = await fetch('/api/disciplines');
+      const data = await response.json();
+      setDisciplines(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error('Ошибка загрузки дисциплин:', error);
+      setDisciplines([]);
+    }
+  };
+
+  const getDisciplineName = (id: number) => {
+    const disc = disciplines.find(d => d.id === id);
+    return disc ? disc.name : 'Неизвестно';
+  };
+
+  const getGroupName = (groupId: number) => {
+    const group = groups.find(g => parseInt(g.id) === groupId);
+    return group ? group.name : 'Неизвестно';
   };
 
   const handleLogout = () => {
@@ -127,10 +255,16 @@ export const MainTeacher: React.FC = () => {
     navigate(`/teacher/group/${groupId}`);
   };
 
-  const notifications: Notification[] = [
-    { id: '1', title: 'Новый студент зачислен', description: 'В группу ИС-21 добавлен новый студент', time: '10 минут назад' },
-    { id: '2', title: 'Обновление расписания', description: 'Изменения в расписании группы ИС-22', time: '2 часа назад' },
-  ];
+  const activePoll = polls.find(p => p.active);
+
+  const getActivePollDisciplineName = () => {
+    if (!activePoll) return 'Неизвестно';
+    if (activePoll.disciplineName && activePoll.disciplineName !== 'Неизвестно') {
+      return activePoll.disciplineName;
+    }
+    const disc = disciplines.find(d => d.id === activePoll.disciplineId);
+    return disc ? disc.name : 'Неизвестно';
+  };
 
   return (
     <div className={styles.pageWrapper}>
@@ -152,7 +286,6 @@ export const MainTeacher: React.FC = () => {
       <div className={styles.gradientCircle}></div>
 
       <main className={styles.mainContainer}>
-        {/* ШАПКА */}
         <header className={styles.header}>
           <div className={styles.headerTop}>
             <div className={styles.headerLogo}>
@@ -165,24 +298,27 @@ export const MainTeacher: React.FC = () => {
             <div className={styles.headerNav}>
               <button className={`${styles.navBtn} ${styles.profile}`} onClick={() => setShowProfile(true)}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="12" cy="7" r="4"></circle>
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
                 </svg>
                 Профиль
               </button>
-              <button className={`${styles.navBtn} ${styles.notifications}`} onClick={() => setShowNotifications(true)}>
+              <button 
+                className={`${styles.navBtn} ${styles.notifications}`} 
+                onClick={() => setShowNotifications(true)}
+              >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                  <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
                 </svg>
                 Уведомления
-                <span className={styles.notificationBadge}>{notifications.length}</span>
+                <span className={styles.notificationBadge}>0</span>
               </button>
               <button className={`${styles.navBtn} ${styles.logoutBtn}`} onClick={handleLogout}>
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                  <polyline points="16 17 21 12 16 7"></polyline>
-                  <line x1="21" y1="12" x2="9" y2="12"></line>
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                  <polyline points="16 17 21 12 16 7"/>
+                  <line x1="21" y1="12" x2="9" y2="12"/>
                 </svg>
                 Выход
               </button>
@@ -194,7 +330,6 @@ export const MainTeacher: React.FC = () => {
           </div>
         </header>
 
-        {/* ПРИВЕТСТВИЕ */}
         <div className={styles.welcomeBlock}>
           <div className={styles.welcomeContent}>
             <div className={styles.welcomeLine}></div>
@@ -209,7 +344,42 @@ export const MainTeacher: React.FC = () => {
           </div>
         </div>
 
-        {/* ГРУППЫ */}
+        {activePoll && (
+          <div className={`${styles.activePollBlock} ${isPollEnding ? styles.activePollExit : ''}`}>
+            <div className={styles.activePollIcon}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0A84FF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M12 6v6l4 2" />
+              </svg>
+            </div>
+            <div className={styles.activePollContent}>
+              <div className={styles.activePollTitle}>
+                <span className={styles.activePollDot}></span>
+                Активный опрос
+              </div>
+              <div className={styles.activePollInfo}>
+                <span className={styles.activePollDiscipline}>
+                  {getActivePollDisciplineName()}
+                </span>
+                <span className={styles.activePollGroup}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                    <circle cx="12" cy="7" r="4" />
+                  </svg>
+                  {getGroupName(activePoll.groupId)}
+                </span>
+                <span className={styles.activePollTime}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
+                  </svg>
+                  {pollTimeLeft} мин {pollSecondsLeft} сек
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className={styles.groupsSection}>
           <div className={styles.sectionHeader}>
             <div className={styles.sectionLine}></div>
@@ -238,16 +408,15 @@ export const MainTeacher: React.FC = () => {
         </div>
       </main>
 
-      {/* ФУТЕР */}
       <footer className={styles.footer}>
         <div className={styles.footerInner}>
           <div className={styles.footerLinks}>
             <FooterTooltip text="Введите ваши данные для входа. Убедитесь, что раскладка клавиатуры верная.">
               <span className={styles.footerLink}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                  <circle cx="12" cy="12" r="10"/>
+                  <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                  <line x1="12" y1="17" x2="12.01" y2="17"/>
                 </svg>
                 Помощь
               </span>
@@ -256,8 +425,8 @@ export const MainTeacher: React.FC = () => {
             <FooterTooltip text="support@university.edu | +7 (999) 123-45-67">
               <span className={styles.footerLink}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="12" cy="7" r="4"></circle>
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
                 </svg>
                 Контакты
               </span>
@@ -266,10 +435,10 @@ export const MainTeacher: React.FC = () => {
             <FooterTooltip text="Все права защищены. Данные конфиденциальны.">
               <span className={styles.footerLink}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                  <line x1="3" y1="9" x2="21" y2="9"></line>
-                  <line x1="3" y1="15" x2="21" y2="15"></line>
-                  <line x1="9" y1="21" x2="9" y2="9"></line>
+                  <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                  <line x1="3" y1="9" x2="21" y2="9"/>
+                  <line x1="3" y1="15" x2="21" y2="15"/>
+                  <line x1="9" y1="21" x2="9" y2="9"/>
                 </svg>
                 Правовая информация
               </span>
@@ -278,8 +447,8 @@ export const MainTeacher: React.FC = () => {
             <FooterTooltip text="Электронный табель посещаемости. Версия 2.0. Разработано в 2026.">
               <span className={styles.footerLink}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                  <polyline points="22 6 12 13 2 6"></polyline>
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                  <polyline points="22 6 12 13 2 6"/>
                 </svg>
                 О портале
               </span>
@@ -288,31 +457,21 @@ export const MainTeacher: React.FC = () => {
         </div>
       </footer>
 
-      {/* МОДАЛКИ */}
       <Modal isOpen={showNotifications} onClose={() => setShowNotifications(false)} title="Уведомления">
-        <div className={styles.notificationsList}>
-          {notifications.map(notif => (
-            <div key={notif.id} className={styles.notificationItem}>
-              <div className={styles.notificationIcon}>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0A84FF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                  <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                </svg>
-              </div>
-              <div className={styles.notificationContent}>
-                <div className={styles.notificationTitle}>{notif.title}</div>
-                <div className={styles.notificationDesc}>{notif.description}</div>
-                <div className={styles.notificationTime}>{notif.time}</div>
-              </div>
-            </div>
-          ))}
+        <div className={styles.notificationsEmpty}>
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+          </svg>
+          <span>Нет уведомлений</span>
         </div>
       </Modal>
 
+      {/* МОДАЛКА ПРОФИЛЯ - полная как у студента */}
       <Modal isOpen={showProfile} onClose={() => setShowProfile(false)} title="Профиль">
         <div className={styles.profileContent}>
           <div className={styles.profileAvatar}>
-            <div className={styles.avatarCircle}>
+            <div className={styles.avatarCircle} style={{ background: selectedColor }}>
               {user?.fullName?.charAt(0) || 'П'}
             </div>
           </div>
@@ -328,6 +487,19 @@ export const MainTeacher: React.FC = () => {
             <div className={styles.profileField}>
               <span className={styles.profileLabel}>Роль</span>
               <span className={styles.profileValue}>Преподаватель</span>
+            </div>
+          </div>
+          <div className={styles.profileAvatarColors}>
+            <span className={styles.avatarColorsLabel}>Выберите цвет аватарки:</span>
+            <div className={styles.avatarColorsList}>
+              {avatarColors.map((color) => (
+                <div
+                  key={color}
+                  className={`${styles.avatarColorOption} ${selectedColor === color ? styles.active : ''}`}
+                  style={{ background: color }}
+                  onClick={() => setSelectedColor(color)}
+                />
+              ))}
             </div>
           </div>
         </div>

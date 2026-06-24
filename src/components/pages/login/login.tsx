@@ -5,7 +5,6 @@ import { setAuth } from '../../../utils/auth';
 import styles from './login.module.scss';
 import { Title } from '../../ui/title/Title';
 import { Logo } from '../../ui/logo/Logo';
-import { Input } from '../../ui/input/Input';
 import { Button } from '../../ui/button/Button';
 import { Link } from '../../ui/link/Link';
 import { Footer } from '../../ui/footer/Footer';
@@ -112,14 +111,19 @@ export const Login: React.FC = () => {
           )}
 
           <form onSubmit={handleSubmit} style={{ width: '100%' }}>
-            <Input
-              type="text"
-              placeholder="Введите логин"
-              label="Логин"
-              value={login}
-              onChange={(e) => setLogin(e.target.value)}
-            />
+            {/* --- ПОЛЕ ЛОГИНА (без глаза) --- */}
+            <div className={styles.inputGroup}>
+              <label className={styles.inputLabel}>Логин</label>
+              <input
+                type="text"
+                placeholder="Введите логин"
+                className={styles.authInput}
+                value={login}
+                onChange={(e) => setLogin(e.target.value)}
+              />
+            </div>
 
+            {/* --- ПОЛЕ ПАРОЛЯ (с глазом) --- */}
             <div className={styles.inputGroup}>
               <label className={styles.inputLabel}>Пароль</label>
               <div className={styles.passwordWrapper}>

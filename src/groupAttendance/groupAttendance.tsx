@@ -96,7 +96,6 @@ export const GroupAttendance: React.FC = () => {
     }
   }, [groupId]);
 
-  // Таймер для обновления опросов каждую секунду
   useEffect(() => {
     const activePoll = polls.find(p => p.active && p.groupId === parseInt(groupId || '0'));
     if (activePoll) {
@@ -108,12 +107,10 @@ export const GroupAttendance: React.FC = () => {
       setPollTimeLeft(leftMinutes);
       setPollSecondsLeft(leftSeconds % 60);
       
-      // Очищаем старый таймер
       if (pollTimer) {
         clearInterval(pollTimer);
       }
       
-      // Создаем новый таймер с обновлением каждую секунду
       const timer = setInterval(() => {
         const now2 = Date.now();
         const leftSec = Math.max(0, Math.floor((expiresAt - now2) / 1000));
@@ -147,7 +144,6 @@ export const GroupAttendance: React.FC = () => {
     }
   }, [polls, groupId]);
 
-  // Дополнительная проверка на истекшие опросы каждые 5 секунд
   useEffect(() => {
     const checkExpired = setInterval(() => {
       setPolls(prevPolls => 
@@ -205,8 +201,9 @@ export const GroupAttendance: React.FC = () => {
     }
   };
 
-  const getDisciplineName = (id: number) => {
-    const disc = disciplines.find(d => d.id === id);
+  const getDisciplineName = (id: number | string) => {
+    const numericId = typeof id === 'string' ? parseInt(id, 10) : id;
+    const disc = disciplines.find(d => d.id === numericId);
     return disc ? disc.name : 'Неизвестно';
   };
 
@@ -331,7 +328,9 @@ export const GroupAttendance: React.FC = () => {
 
     const now = new Date();
     const expiresAt = new Date(now.getTime() + pollMinutes * 60000);
-    const disciplineName = getDisciplineName(pollDiscipline);
+    
+    const discipline = disciplines.find(d => d.id === pollDiscipline);
+    const disciplineName = discipline ? discipline.name : 'Неизвестно';
 
     const newPoll = {
       disciplineId: pollDiscipline,
@@ -359,10 +358,54 @@ export const GroupAttendance: React.FC = () => {
     }
   };
 
+  const cancelPoll = async () => {
+    const activePoll = polls.find(p => p.active && p.groupId === parseInt(groupId || '0'));
+    if (!activePoll) return;
+
+    if (!confirm(`Вы уверены, что хотите отменить опрос по "${getDisciplineName(activePoll.disciplineId)}"?`)) {
+      return;
+    }
+
+    try {
+      await fetch(`/api/polls/${activePoll.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ active: false })
+      });
+
+      await fetch('/api/notifications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title: 'Опрос отменён',
+          description: `Преподаватель ${user?.fullName || 'Преподаватель'} отменил опрос по "${getDisciplineName(activePoll.disciplineId)}"`,
+          type: 'poll_cancelled',
+          data: { 
+            groupId: groupId,
+            disciplineId: activePoll.disciplineId,
+            teacherName: user?.fullName
+          }
+        })
+      });
+
+      setPolls(prev => prev.map(p => p.id === activePoll.id ? { ...p, active: false } : p));
+      setIsPollActive(false);
+      setPollTimeLeft(0);
+      setPollSecondsLeft(0);
+      
+      if (pollTimer) {
+        clearInterval(pollTimer);
+        setPollTimer(null);
+      }
+    } catch (error) {
+      console.error('Ошибка отмены опроса:', error);
+      alert('Не удалось отменить опрос');
+    }
+  };
+
   const handlePollEnd = async (poll: Poll) => {
     const today = new Date().toISOString().split('T')[0];
     
-    // Устанавливаем статус "Н" (отсутствовал) для всех студентов, кто не отметился
     for (const student of students) {
       const existing = attendance.find(
         a => a.studentId === parseInt(student.id) && 
@@ -380,7 +423,6 @@ export const GroupAttendance: React.FC = () => {
       }
     }
     
-    // Деактивируем опрос в базе данных
     try {
       await fetch(`/api/polls/${poll.id}`, {
         method: 'PATCH',
@@ -395,6 +437,166 @@ export const GroupAttendance: React.FC = () => {
     } catch (error) {
       console.error('Ошибка завершения опроса:', error);
     }
+  };
+
+  const downloadReport = () => {
+    const currentDates = getCurrentDates();
+    
+    let periodTitle = '';
+    if (viewMode === 'day') {
+      const date = currentDates[0];
+      periodTitle = `За ${date.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })}`;
+    } else if (viewMode === 'week') {
+      const start = currentDates[0];
+      const end = currentDates[currentDates.length - 1];
+      periodTitle = `За неделю с ${start.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' })} по ${end.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })}`;
+    } else {
+      periodTitle = `За ${monthNames[selectedMonth]} ${selectedYear} года`;
+    }
+
+    // ПРАВИЛЬНОЕ ПОЛУЧЕНИЕ НАЗВАНИЯ ДИСЦИПЛИНЫ
+    let disciplineName = 'Все дисциплины';
+    if (selectedDiscipline !== null) {
+      const found = disciplines.find(d => d.id === selectedDiscipline);
+      disciplineName = found ? found.name : 'Неизвестно';
+    }
+
+    let tableRows = '';
+    let totals: { [key: string]: { total: number; present: number; absent: number; respected: number; notRespected: number } } = {};
+
+    students.forEach((student, index) => {
+      let total = 0;
+      let present = 0;
+      let absent = 0;
+      let respected = 0;
+      let notRespected = 0;
+
+      let row = `<tr>
+        <td style="border:1px solid #000;padding:6px;text-align:center;">${index + 1}</td>
+        <td style="border:1px solid #000;padding:6px;">${student.fullName}</td>`;
+
+      currentDates.forEach((date) => {
+        const dateStr = date.toISOString().split('T')[0];
+        const disciplineId = selectedDiscipline || (disciplines.length > 0 ? disciplines[0].id : 0);
+        const status = getStudentAttendance(parseInt(student.id), disciplineId, dateStr);
+        
+        if (status === 'П') { total++; present++; respected++; }
+        else if (status === 'Н') { total++; absent++; notRespected++; }
+        
+        row += `<td style="border:1px solid #000;padding:6px;text-align:center;">${status}</td>`;
+      });
+
+      row += `
+        <td style="border:1px solid #000;padding:6px;text-align:center;">${total}</td>
+        <td style="border:1px solid #000;padding:6px;text-align:center;">${respected}</td>
+        <td style="border:1px solid #000;padding:6px;text-align:center;">${notRespected}</td>
+      </tr>`;
+
+      tableRows += row;
+
+      totals[student.fullName] = { total, present, absent, respected, notRespected };
+    });
+
+    let totalAll = 0;
+    let totalRespected = 0;
+    let totalNotRespected = 0;
+
+    Object.values(totals).forEach(t => {
+      totalAll += t.total;
+      totalRespected += t.respected;
+      totalNotRespected += t.notRespected;
+    });
+
+    const totalStudents = students.length;
+    const averageAttendance = totalStudents > 0 ? Math.round((totalAll / (totalStudents * currentDates.length)) * 100) : 0;
+
+    let dateHeaders = '';
+    currentDates.forEach((date) => {
+      const dayName = weekDays[date.getDay() === 0 ? 6 : date.getDay() - 1];
+      dateHeaders += `<th style="border:1px solid #000;padding:6px;text-align:center;font-size:11px;">
+        ${dayName}<br>${date.getDate()}.${date.getMonth() + 1}
+      </th>`;
+    });
+
+    const htmlContent = `
+      <html xmlns:o='urn:schemas-microsoft-com:office:office' 
+            xmlns:w='urn:schemas-microsoft-com:office:word' 
+            xmlns='http://www.w3.org/TR/REC-html40'>
+      <head>
+        <meta charset="utf-8">
+        <title>Отчет по посещаемости</title>
+        <!--[if gte mso 9]>
+        <xml>
+          <w:WordDocument>
+            <w:View>Print</w:View>
+            <w:Zoom>100</w:Zoom>
+          </w:WordDocument>
+        </xml>
+        <![endif]-->
+        <style>
+          body { font-family: 'Times New Roman', Times, serif; margin: 40px; }
+          h1 { text-align: center; font-size: 18pt; margin-bottom: 10px; }
+          .subtitle { text-align: center; font-size: 14pt; margin-bottom: 20px; color: #555; }
+          table { border-collapse: collapse; width: 100%; font-size: 11pt; }
+          th { background: #e8f0fe; font-weight: bold; }
+          .total-row { background: #f0f0f0; font-weight: bold; }
+          .total-label { font-weight: bold; }
+          .footer-text { text-align: center; margin-top: 20px; font-size: 10pt; color: #888; }
+        </style>
+      </head>
+      <body>
+        <h1>ОТЧЕТ ПО ПОСЕЩАЕМОСТИ</h1>
+        <p class="subtitle">Группа: ${group?.name || 'Не выбрана'} | ${periodTitle}</p>
+        <p><strong>Дисциплина:</strong> ${disciplineName}</p>
+        <p><strong>Всего студентов:</strong> ${students.length}</p>
+        <br>
+        
+        <table>
+          <thead>
+            <tr>
+              <th style="border:1px solid #000;padding:6px;text-align:center;width:40px;">№</th>
+              <th style="border:1px solid #000;padding:6px;text-align:left;">ФИО студента</th>
+              ${dateHeaders}
+              <th style="border:1px solid #000;padding:6px;text-align:center;">Всего</th>
+              <th style="border:1px solid #000;padding:6px;text-align:center;">Уваж.</th>
+              <th style="border:1px solid #000;padding:6px;text-align:center;">Неуваж.</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${tableRows}
+          </tbody>
+          <tfoot>
+            <tr class="total-row">
+              <td colspan="2" style="border:1px solid #000;padding:6px;text-align:right;">ИТОГО:</td>
+              <td style="border:1px solid #000;padding:6px;text-align:center;">${totalAll}</td>
+              <td style="border:1px solid #000;padding:6px;text-align:center;">${totalRespected}</td>
+              <td style="border:1px solid #000;padding:6px;text-align:center;">${totalNotRespected}</td>
+            </tr>
+            <tr>
+              <td colspan="2" style="border:1px solid #000;padding:6px;text-align:right;">Средняя посещаемость:</td>
+              <td colspan="3" style="border:1px solid #000;padding:6px;text-align:center;font-weight:bold;">${averageAttendance}%</td>
+            </tr>
+          </tfoot>
+        </table>
+        
+        <p class="footer-text">Отчет сформирован: ${new Date().toLocaleString('ru-RU')}</p>
+      </body>
+      </html>
+    `;
+
+    const blob = new Blob([htmlContent], { type: 'application/msword;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `Отчет_по_посещаемости_${group?.name || 'группа'}_${new Date().toISOString().split('T')[0]}.doc`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const saveReport = () => {
+    alert('Отчет сохранен!');
   };
 
   const currentDates = getCurrentDates();
@@ -424,7 +626,6 @@ export const GroupAttendance: React.FC = () => {
 
       <div className={styles.fadeInUp}>
         <main className={styles.mainContainer}>
-          {/* ШАПКА - компактная */}
           <header className={styles.header}>
             <div className={styles.headerTop}>
               <div className={styles.headerLogo}>
@@ -458,7 +659,6 @@ export const GroupAttendance: React.FC = () => {
             </div>
           </header>
 
-          {/* КНОПКА НАЗАД */}
           <div className={styles.backWrapper}>
             <button className={styles.backBtn} onClick={handleGoBack}>
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -468,7 +668,6 @@ export const GroupAttendance: React.FC = () => {
             </button>
           </div>
 
-          {/* БЛОК ОПРОСА */}
           <div className={styles.pollBlock}>
             <div className={styles.pollHeader}>
               <div className={styles.pollTitle}>
@@ -521,15 +720,27 @@ export const GroupAttendance: React.FC = () => {
                   <div className={styles.pollGroupDisplay}>{group?.name || 'Не выбрана'}</div>
                 </div>
               </div>
+
               <div className={styles.pollActions}>
                 {isPollActive ? (
                   <div className={styles.pollActive}>
-                    <span className={styles.pollActiveIcon}>●</span>
+                    <span className={styles.pollActiveIcon}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                      </svg>
+                    </span>
                     <span>
                       Опрос идёт! Осталось {pollTimeLeft} мин {pollSecondsLeft} сек
                     </span>
                     <span className={styles.pollActiveDiscipline}>
-                      {getDisciplineName(polls.find(p => p.active)?.disciplineId || 0)}
+                      {(() => {
+                        const activePoll = polls.find(p => p.active);
+                        if (!activePoll) return 'Неизвестно';
+                        if (activePoll.disciplineName && activePoll.disciplineName !== 'Неизвестно') {
+                          return activePoll.disciplineName;
+                        }
+                        return getDisciplineName(activePoll.disciplineId);
+                      })()}
                     </span>
                   </div>
                 ) : (
@@ -538,11 +749,49 @@ export const GroupAttendance: React.FC = () => {
                   </button>
                 )}
               </div>
+
+              {isPollActive && (
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'flex-end',
+                  marginTop: '8px'
+                }}>
+                  <button 
+                    onClick={cancelPoll}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '6px 20px',
+                      background: 'rgba(239, 68, 68, 0.1)',
+                      border: '1px solid rgba(239, 68, 68, 0.3)',
+                      borderRadius: '20px',
+                      fontSize: '13px',
+                      fontWeight: '600',
+                      color: '#ef4444',
+                      cursor: 'pointer',
+                      fontFamily: 'Nunito, sans-serif',
+                      transition: 'all 0.3s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = 'rgba(239, 68, 68, 0.2)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)';
+                    }}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="18" y1="6" x2="6" y2="18"></line>
+                      <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                    Отменить опрос
+                  </button>
+                </div>
+              )}
             </div>
           </div>
 
           <div className={styles.contentWrapper}>
-            {/* БОКОВАЯ ПАНЕЛЬ */}
             <aside className={styles.sidebar}>
               <div className={styles.groupInfo}>
                 <h3>Группа {group?.name}</h3>
@@ -655,7 +904,6 @@ export const GroupAttendance: React.FC = () => {
               </div>
             </aside>
 
-            {/* ОСНОВНАЯ ТАБЛИЦА */}
             <section className={styles.tableSection}>
               <div className={styles.tableHeader}>
                 <div className={styles.tableTitle}>
@@ -663,7 +911,22 @@ export const GroupAttendance: React.FC = () => {
                   <h2>Контроль посещаемости</h2>
                 </div>
                 <div className={styles.tableActions}>
-                  <button className={styles.reportBtn}>Сохранить отчет</button>
+                  <button className={styles.reportBtn} onClick={saveReport}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}>
+                      <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                      <polyline points="17 21 17 13 7 13 7 21"/>
+                      <polyline points="7 3 7 8 15 8"/>
+                    </svg>
+                    Сохранить отчет
+                  </button>
+                  <button className={styles.downloadBtn} onClick={downloadReport}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '6px' }}>
+                      <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                      <polyline points="7 10 12 15 17 10"/>
+                      <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    Скачать отчет
+                  </button>
                 </div>
               </div>
 
@@ -709,9 +972,8 @@ export const GroupAttendance: React.FC = () => {
                           <td>{student.fullName}</td>
                           {currentDates.map((date, i) => {
                             const dateStr = date.toISOString().split('T')[0];
-                            const status = selectedDiscipline 
-                              ? getStudentAttendance(parseInt(student.id), selectedDiscipline, dateStr)
-                              : '-';
+                            const disciplineId = selectedDiscipline || (disciplines.length > 0 ? disciplines[0].id : 0);
+                            const status = getStudentAttendance(parseInt(student.id), disciplineId, dateStr);
                             
                             if (status === 'П') { total++; respected++; }
                             else if (status === 'Н') { total++; notRespected++; }
@@ -725,7 +987,7 @@ export const GroupAttendance: React.FC = () => {
                                     const newStatus = e.target.value;
                                     updateAttendance(
                                       parseInt(student.id),
-                                      selectedDiscipline || 0,
+                                      disciplineId,
                                       dateStr,
                                       newStatus
                                     );
@@ -753,7 +1015,6 @@ export const GroupAttendance: React.FC = () => {
         </main>
       </div>
 
-      {/* МОДАЛКА ПРОФИЛЯ */}
       <Modal isOpen={showProfile} onClose={() => setShowProfile(false)} title="Профиль">
         <div className={styles.profileContent}>
           <div className={styles.profileAvatar}>

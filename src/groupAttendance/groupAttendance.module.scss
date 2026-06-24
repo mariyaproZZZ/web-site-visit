@@ -145,33 +145,6 @@
   height: 15px;
 }
 
-/* --- КНОПКА ВЫЙТИ --- */
-.logoutBtn {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 13px;
-  font-weight: 700;
-  padding: 6px 16px;
-  border-radius: 25px;
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  background: rgba(239, 68, 68, 0.1);
-  color: #dc2626;
-}
-
-.logoutBtn:hover {
-  background: rgba(239, 68, 68, 0.2);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.15);
-}
-
-.logoutBtn svg {
-  width: 16px;
-  height: 16px;
-}
-
 /* --- КНОПКА НАЗАД --- */
 .backWrapper {
   margin-bottom: 14px;
@@ -964,6 +937,9 @@
   box-shadow: 0 6px 25px rgba(146, 205, 71, 0.5);
 }
 
+/* --- СТИЛИ ДЛЯ АКТИВНОГО ОПРОСА И КНОПКИ ОТМЕНЫ --- */
+
+/* Контейнер активного опроса */
 .pollActive {
   display: flex;
   align-items: center;
@@ -975,11 +951,193 @@
   font-size: 13px;
   font-weight: 600;
   color: #1e293b;
+  flex-wrap: wrap;
+}
+
+/* Иконка активного опроса (пульсирующий круг) */
+.pollActiveIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #22c55e;
+  animation: pulse 1.5s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+.pollActiveIcon svg {
+  stroke: #22c55e;
+  fill: #22c55e;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(0.8);
+  }
+}
+
+/* Название дисциплины в активном опросе */
+.pollActiveDiscipline {
+  background: rgba(10, 132, 255, 0.1);
+  padding: 2px 10px;
+  border-radius: 12px;
+  color: #0A84FF;
+  font-weight: 700;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+/* --- СТИЛИ ДЛЯ АКТИВНОГО ОПРОСА И КНОПКИ ОТМЕНЫ --- */
+
+/* Контейнер активного опроса - теперь flex с обтеканием */
+.pollActive {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 16px;
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  border-radius: 25px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+/* Иконка активного опроса */
+.pollActiveIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #22c55e;
+  animation: pulse 1.5s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+.pollActiveIcon svg {
+  stroke: #22c55e;
+  fill: #22c55e;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(0.8);
+  }
+}
+
+/* Текст опроса */
+.pollActiveText {
+  flex-shrink: 0;
+}
+
+/* Название дисциплины */
+.pollActiveDiscipline {
+  background: rgba(10, 132, 255, 0.1);
+  padding: 2px 10px;
+  border-radius: 12px;
+  color: #0A84FF;
+  font-weight: 700;
+  font-size: 12px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* --- ГРУППА С КНОПКОЙ ОТМЕНЫ --- */
+.pollGroupDisplay {
+  padding: 5px 10px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.15);
+  font-size: 12px;
+  font-weight: 600;
+  color: #1e293b;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+}
+
+/* КНОПКА ОТМЕНЫ ОПРОСА - внутри поля группы */
+.pollCancelBtn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 14px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #ef4444;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Nunito', sans-serif;
+  white-space: nowrap;
+  flex-shrink: 0;
+  height: 24px;
+}
+
+.pollCancelBtn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  transform: scale(1.05);
+}
+
+.pollCancelBtn svg {
+  stroke: #ef4444;
+  width: 12px;
+  height: 12px;
+}
+
+/* --- СТИЛИ ДЛЯ АКТИВНОГО ОПРОСА --- */
+.pollActive {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 16px;
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  border-radius: 25px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+  flex-wrap: wrap;
 }
 
 .pollActiveIcon {
-  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   color: #22c55e;
+  animation: pulse 1.5s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+.pollActiveIcon svg {
+  stroke: #22c55e;
+  fill: #22c55e;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(0.8);
+  }
 }
 
 .pollActiveDiscipline {
@@ -989,9 +1147,81 @@
   color: #0A84FF;
   font-weight: 700;
   font-size: 12px;
+  white-space: nowrap;
 }
 
-/* --- НАВИГАЦИОННЫЕ КНОПКИ С ВЕКТОРНЫМИ ИКОНКАМИ --- */
+.pollActions {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.pollStartBtn {
+  padding: 6px 24px;
+  background: linear-gradient(to bottom, #e3f8c2 0%, #bce97f 45%, #92cd47 46%, #a9e05d 100%);
+  border: 1px solid #79aa32;
+  border-radius: 25px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #0e1e05;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(146, 205, 71, 0.3);
+}
+
+.pollStartBtn:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 25px rgba(146, 205, 71, 0.5);
+}
+
+/* Название дисциплины */
+.pollActiveDiscipline {
+  background: rgba(10, 132, 255, 0.1);
+  padding: 2px 10px;
+  border-radius: 12px;
+  color: #0A84FF;
+  font-weight: 700;
+  font-size: 12px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* КНОПКА ОТМЕНЫ ОПРОСА */
+.pollCancelBtn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 14px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #ef4444;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Nunito', sans-serif;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.pollCancelBtn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  transform: scale(1.05);
+}
+
+.pollCancelBtn svg {
+  stroke: #ef4444;
+}
+
+/* Контейнер для действий */
+.pollActions {
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+/* --- НАВИГАЦИОННЫЕ КНОПКИ --- */
 .weekNavBtn,
 .monthNavBtn {
   background: rgba(255, 255, 255, 0.2);
@@ -1033,33 +1263,75 @@
   text-align: center;
 }
 
-/* --- КНОПКА НАЗАД --- */
-.backBtn {
-  display: inline-flex;
+/* --- КНОПКИ ДЕЙСТВИЙ В ТАБЛИЦЕ --- */
+.tableActions {
+  display: flex;
+  gap: 10px;
   align-items: center;
-  gap: 5px;
-  background: rgba(255, 255, 255, 0.3);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.reportBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 20px;
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.3);
   border-radius: 12px;
-  padding: 5px 16px;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
-  color: #1e293b;
+  color: #22c55e;
   cursor: pointer;
   transition: all 0.3s ease;
+  white-space: nowrap;
 }
 
-.backBtn:hover {
-  background: rgba(255, 255, 255, 0.5);
-  transform: translateX(-3px);
+.reportBtn:hover {
+  background: rgba(34, 197, 94, 0.25);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(34, 197, 94, 0.2);
 }
 
-.backBtn svg {
-  transition: transform 0.3s ease;
+.reportBtn svg {
+  stroke: #22c55e;
 }
 
-.backBtn:hover svg {
-  transform: translateX(-3px);
+.downloadBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 20px;
+  background: rgba(10, 132, 255, 0.1);
+  border: 1px solid rgba(10, 132, 255, 0.2);
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #0A84FF;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.downloadBtn:hover {
+  background: rgba(10, 132, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(10, 132, 255, 0.2);
+}
+
+.downloadBtn svg {
+  stroke: #0A84FF;
+}
+
+@media (max-width: 768px) {
+  .tableActions {
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+  }
+  
+  .reportBtn,
+  .downloadBtn {
+    width: 100%;
+    justify-content: center;
+  }
 }

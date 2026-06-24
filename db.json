@@ -431,6 +431,41 @@
       "date": "2026-06-23",
       "status": "П",
       "id": "Yox3c_vIqM4"
+    },
+    {
+      "studentId": 1,
+      "disciplineId": "1",
+      "date": "2026-06-24",
+      "status": "Н",
+      "id": "Dm607WehY8Q"
+    },
+    {
+      "studentId": 2,
+      "disciplineId": "1",
+      "date": "2026-06-24",
+      "status": "Н",
+      "id": "plRkRHgTSZI"
+    },
+    {
+      "studentId": 3,
+      "disciplineId": "1",
+      "date": "2026-06-24",
+      "status": "Н",
+      "id": "4BsfJJlWUF4"
+    },
+    {
+      "studentId": 4,
+      "disciplineId": "1",
+      "date": "2026-06-24",
+      "status": "Н",
+      "id": "5fDeCbf69mk"
+    },
+    {
+      "studentId": 1,
+      "disciplineId": 3,
+      "date": "2026-06-24",
+      "status": "П",
+      "id": "0ccO4uACbPM"
     }
   ],
   "polls": [
@@ -460,9 +495,99 @@
       "groupId": 1,
       "startedAt": "2026-06-23T16:11:49.007Z",
       "expiresAt": "2026-06-23T16:26:49.007Z",
-      "active": true,
+      "active": false,
       "disciplineName": "Высшая математика",
       "id": "FqlwyEhYNZg"
+    },
+    {
+      "disciplineId": "1",
+      "teacherId": 1,
+      "groupId": 1,
+      "startedAt": "2026-06-24T05:32:18.271Z",
+      "expiresAt": "2026-06-24T05:47:18.271Z",
+      "active": false,
+      "disciplineName": "Высшая математика",
+      "id": "Vw1SOWVU2fE"
+    },
+    {
+      "disciplineId": "1",
+      "teacherId": 1,
+      "groupId": 1,
+      "startedAt": "2026-06-24T05:53:13.301Z",
+      "expiresAt": "2026-06-24T06:08:13.301Z",
+      "active": false,
+      "disciplineName": "Высшая математика",
+      "id": "kWfAtGoAqUw"
+    },
+    {
+      "disciplineId": "1",
+      "teacherId": 1,
+      "groupId": 1,
+      "startedAt": "2026-06-24T05:53:51.559Z",
+      "expiresAt": "2026-06-24T06:08:51.559Z",
+      "active": false,
+      "disciplineName": "Высшая математика",
+      "id": "l9BGppFURqQ"
+    },
+    {
+      "disciplineId": "1",
+      "teacherId": 1,
+      "groupId": 1,
+      "startedAt": "2026-06-24T06:10:05.089Z",
+      "expiresAt": "2026-06-24T06:25:05.089Z",
+      "active": false,
+      "disciplineName": "Высшая математика",
+      "id": "yBoS9tKvni0"
+    },
+    {
+      "disciplineId": 3,
+      "teacherId": 1,
+      "groupId": 1,
+      "startedAt": "2026-06-24T07:01:53.608Z",
+      "expiresAt": "2026-06-24T07:11:53.608Z",
+      "active": false,
+      "disciplineName": "Неизвестно",
+      "id": "P_4KQtzkj28"
+    },
+    {
+      "disciplineId": "1",
+      "teacherId": 1,
+      "groupId": 1,
+      "startedAt": "2026-06-24T07:14:10.702Z",
+      "expiresAt": "2026-06-24T07:29:10.702Z",
+      "active": false,
+      "disciplineName": "Неизвестно",
+      "id": "HjXhLz_U0bw"
+    },
+    {
+      "disciplineId": "1",
+      "teacherId": 1,
+      "groupId": 1,
+      "startedAt": "2026-06-24T07:26:32.840Z",
+      "expiresAt": "2026-06-24T07:41:32.840Z",
+      "active": false,
+      "disciplineName": "Высшая математика",
+      "id": "IkIsY_zxbvw"
+    },
+    {
+      "disciplineId": "6",
+      "teacherId": 1,
+      "groupId": 2,
+      "startedAt": "2026-06-24T07:27:27.577Z",
+      "expiresAt": "2026-06-24T07:42:27.577Z",
+      "active": false,
+      "disciplineName": "Математический анализ",
+      "id": "1Kw8CTWarT8"
+    },
+    {
+      "disciplineId": "1",
+      "teacherId": 1,
+      "groupId": 1,
+      "startedAt": "2026-06-24T07:32:37.222Z",
+      "expiresAt": "2026-06-24T07:47:37.222Z",
+      "active": false,
+      "disciplineName": "Высшая математика",
+      "id": "XhBGWgqZz58"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

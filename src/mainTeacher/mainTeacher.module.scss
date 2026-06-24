@@ -539,6 +539,129 @@ body,
   margin: 0;
 }
 
+/* --- БЛОК АКТИВНОГО ОПРОСА --- */
+.activePollBlock {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: rgba(10, 132, 255, 0.08);
+  backdrop-filter: blur(25px) saturate(180%);
+  -webkit-backdrop-filter: blur(25px) saturate(180%);
+  border: 1px solid rgba(10, 132, 255, 0.15);
+  border-radius: 16px;
+  padding: 14px 20px;
+  animation: fadeSlideUp 0.5s ease forwards;
+}
+
+.activePollIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(10, 132, 255, 0.12);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.activePollIcon svg {
+  stroke: #0A84FF;
+}
+
+.activePollContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.activePollTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #0A84FF;
+}
+
+.activePollDot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: #22c55e;
+  border-radius: 50%;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(0.7);
+  }
+}
+
+.activePollInfo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.activePollDiscipline {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.activePollGroup {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: #475569;
+  background: rgba(255, 255, 255, 0.3);
+  padding: 2px 10px;
+  border-radius: 12px;
+}
+
+.activePollGroup svg {
+  stroke: #475569;
+}
+
+.activePollTime {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: #ef4444;
+  font-weight: 600;
+  background: rgba(239, 68, 68, 0.08);
+  padding: 2px 10px;
+  border-radius: 12px;
+}
+
+.activePollTime svg {
+  stroke: #ef4444;
+}
+
+@media (max-width: 768px) {
+  .activePollBlock {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .activePollInfo {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+}
+
 /* --- ГРУППЫ --- */
 .groupsSection {
   display: flex;
@@ -724,355 +847,6 @@ body,
   transform: scale(1.1);
 }
 
-/* --- УВЕДОМЛЕНИЯ --- */
-.notificationsList {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.notificationItem {
-  display: flex;
-  gap: 10px;
-  padding: 10px 12px;
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  transition: background 0.3s ease;
-}
-
-.notificationItem:hover {
-  background: rgba(255, 255, 255, 0.8);
-}
-
-.notificationIcon {
-  width: 30px;
-  height: 30px;
-  background: rgba(10, 132, 255, 0.1);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.notificationContent {
-  flex: 1;
-}
-
-.notificationTitle {
-  font-weight: 700;
-  color: #1e293b;
-  font-size: 13px;
-}
-
-.notificationDesc {
-  color: #475569;
-  font-size: 12px;
-  margin-top: 1px;
-}
-
-.notificationTime {
-  color: #94a3b8;
-  font-size: 11px;
-  margin-top: 3px;
-}
-
-.notificationBadge {
-  background: #ef4444;
-  color: white;
-  font-size: 10px;
-  font-weight: 700;
-  border-radius: 50%;
-  width: 18px;
-  height: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* --- ПРОФИЛЬ --- */
-.profileContent {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 14px;
-}
-
-.profileAvatar {
-  margin-bottom: 5px;
-}
-
-.avatarCircle {
-  width: 70px;
-  height: 70px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 28px;
-  font-weight: 700;
-  color: white;
-  background: #0A84FF;
-  border: 3px solid rgba(255, 255, 255, 0.6);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-}
-
-.profileInfo {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 14px;
-  padding: 12px 16px;
-}
-
-.profileField {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 3px 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-.profileField:last-child {
-  border-bottom: none;
-}
-
-.profileLabel {
-  font-weight: 600;
-  color: #64748b;
-  font-size: 12px;
-}
-
-.profileValue {
-  font-weight: 700;
-  color: #1e293b;
-  font-size: 13px;
-}
-
-/* --- АДАПТИВНОСТЬ --- */
-@media (max-width: 1024px) {
-  .groupsGrid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 768px) {
-  .pageWrapper {
-    padding: 12px 12px 8px;
-  }
-  
-  .mainContainer {
-    gap: 20px;
-    padding: 0 6px 8px;
-  }
-  
-  .groupsGrid {
-    grid-template-columns: 1fr;
-    gap: 14px;
-  }
-  
-  .header {
-    padding: 10px 14px;
-    gap: 6px;
-  }
-  
-  .headerTop {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 6px;
-  }
-  
-  .headerNav {
-    justify-content: flex-end;
-    flex-wrap: wrap;
-    gap: 8px;
-  }
-  
-  .headerTitle {
-    font-size: 16px;
-  }
-  
-  .headerLogo {
-    font-size: 12px;
-  }
-  
-  .navItem {
-    font-size: 12px;
-    padding: 3px 8px;
-  }
-  
-  .welcomeTitle {
-    font-size: 18px;
-  }
-  
-  .welcomeBlock {
-    padding: 14px 16px;
-  }
-  
-  .welcomeSubtitle {
-    font-size: 13px;
-  }
-  
-  .footer {
-    flex-direction: column;
-    gap: 12px;
-    padding: 14px 16px;
-  }
-  
-  .footerInner {
-    flex-direction: column;
-    gap: 12px;
-  }
-  
-  .footerLinks {
-    gap: 12px;
-    font-size: 12px;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-  
-  .footerSocial {
-    gap: 12px;
-  }
-  
-  .sectionTitle {
-    font-size: 18px;
-  }
-  
-  .groupCard {
-    padding: 16px 18px;
-  }
-  
-  .loadingText {
-    grid-column: span 1;
-  }
-}
-
-/* --- ФУТЕР --- */
-.footer {
-  width: 100%;
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 12px 24px;
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(30px) saturate(180%);
-  -webkit-backdrop-filter: blur(30px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: 20px;
-  box-shadow: 0 10px 40px rgba(135, 206, 250, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.6);
-  z-index: 1;
-  flex-shrink: 0;
-  box-sizing: border-box;
-}
-
-.footerInner {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.footerLinks {
-  display: flex;
-  gap: 24px;
-  color: #1e293b;
-  font-weight: 600;
-  font-size: 13px;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-.footerLink {
-  cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 8px;
-  transition: background 0.3s ease;
-  color: #1e293b;
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-}
-
-.footerLink:hover {
-  background: rgba(255, 255, 255, 0.3);
-}
-
-.footerLink svg {
-  width: 15px;
-  height: 15px;
-  flex-shrink: 0;
-}
-
-/* --- ТУЛТИПЫ ДЛЯ ФУТЕРА --- */
-.footerTooltipWrapper {
-  position: relative;
-  display: inline-block;
-}
-
-.footerTooltip {
-  position: absolute;
-  bottom: 120%;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: 16px;
-  padding: 12px 18px;
-  width: 250px;
-  font-size: 13px;
-  color: #1e293b;
-  font-weight: 500;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
-  z-index: 100;
-  text-align: center;
-  line-height: 1.5;
-  pointer-events: none;
-}
-
-.footerTooltip::after {
-  content: '';
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  border: 8px solid transparent;
-  border-top-color: rgba(255, 255, 255, 0.95);
-}
-
-.tooltipEnter {
-  animation: tooltipSlideDown 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-}
-
-.tooltipExit {
-  animation: tooltipSlideUp 0.3s ease-in forwards;
-}
-
-@keyframes tooltipSlideDown {
-  from {
-    opacity: 0;
-    transform: translateX(-50%) translateY(-15px) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0) scale(1);
-  }
-}
-
-@keyframes tooltipSlideUp {
-  from {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0) scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: translateX(-50%) translateY(-15px) scale(0.95);
-  }
-}
 /* --- УВЕДОМЛЕНИЯ --- */
 .notificationsList {
   display: flex;
@@ -1276,4 +1050,371 @@ body,
   align-items: center;
   justify-content: center;
   padding: 0 4px;
+}
+
+/* --- ТУЛТИПЫ ДЛЯ ФУТЕРА --- */
+.footerTooltipWrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.footerTooltip {
+  position: absolute;
+  bottom: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 16px;
+  padding: 12px 18px;
+  width: 250px;
+  font-size: 13px;
+  color: #1e293b;
+  font-weight: 500;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  text-align: center;
+  line-height: 1.5;
+  pointer-events: none;
+}
+
+.footerTooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 8px solid transparent;
+  border-top-color: rgba(255, 255, 255, 0.95);
+}
+
+.tooltipEnter {
+  animation: tooltipSlideDown 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.tooltipExit {
+  animation: tooltipSlideUp 0.3s ease-in forwards;
+}
+
+@keyframes tooltipSlideDown {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-15px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+@keyframes tooltipSlideUp {
+  from {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-15px) scale(0.95);
+  }
+}
+
+/* --- БЛОК АКТИВНОГО ОПРОСА --- */
+.activePollBlock {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: rgba(10, 132, 255, 0.08);
+  backdrop-filter: blur(25px) saturate(180%);
+  -webkit-backdrop-filter: blur(25px) saturate(180%);
+  border: 1px solid rgba(10, 132, 255, 0.15);
+  border-radius: 16px;
+  padding: 14px 20px;
+  animation: fadeSlideUp 0.5s ease forwards;
+}
+
+.activePollIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(10, 132, 255, 0.12);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.activePollIcon svg {
+  stroke: #0A84FF;
+}
+
+.activePollContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.activePollTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: #0A84FF;
+}
+
+.activePollDot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: #22c55e;
+  border-radius: 50%;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(0.7);
+  }
+}
+
+.activePollInfo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.activePollDiscipline {
+  font-size: 15px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.activePollGroup {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: #475569;
+  background: rgba(255, 255, 255, 0.3);
+  padding: 2px 10px;
+  border-radius: 12px;
+}
+
+.activePollGroup svg {
+  stroke: #475569;
+}
+
+.activePollTime {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: #ef4444;
+  font-weight: 600;
+  background: rgba(239, 68, 68, 0.08);
+  padding: 2px 10px;
+  border-radius: 12px;
+}
+
+.activePollTime svg {
+  stroke: #ef4444;
+}
+
+@media (max-width: 768px) {
+  .activePollBlock {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  
+  .activePollInfo {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+}
+
+/* --- АНИМАЦИЯ ИСЧЕЗНОВЕНИЯ БЛОКА АКТИВНОГО ОПРОСА --- */
+.activePollExit {
+  animation: slideUpFade 0.5s ease-in forwards;
+}
+
+@keyframes slideUpFade {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    max-height: 200px;
+    margin-bottom: 10px;
+    padding: 14px 20px;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+    max-height: 0;
+    margin-bottom: 0;
+    padding: 0 20px;
+    overflow: hidden;
+  }
+}
+
+/* --- ПРИНУДИТЕЛЬНОЕ ЦЕНТРИРОВАНИЕ ФУТЕРА --- */
+.footer {
+  display: flex !important;
+  justify-content: center !important;
+  width: 100% !important;
+  max-width: 1280px !important;
+  margin: 0 auto !important;
+  padding: 12px 24px !important;
+}
+
+.footerInner {
+  display: flex !important;
+  justify-content: center !important;
+  width: 100% !important;
+}
+
+.footerLinks {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 24px !important;
+  width: 100% !important;
+}
+
+.footerLink {
+  display: flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  padding: 4px 8px !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+  transition: background 0.3s ease !important;
+  color: #1e293b !important;
+  text-decoration: none !important;
+  font-weight: 600 !important;
+  font-size: 13px !important;
+}
+
+.footerLink:hover {
+  background: rgba(255, 255, 255, 0.3) !important;
+}
+
+.footerLink svg {
+  width: 15px !important;
+  height: 15px !important;
+  flex-shrink: 0 !important;
+}
+
+
+/* --- ПРОФИЛЬ --- */
+.profileContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.profileAvatar {
+  margin-bottom: 5px;
+}
+
+.avatarCircle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  font-weight: 700;
+  color: white;
+  border: 3px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  transition: background 0.3s ease;
+}
+
+.profileInfo {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 14px;
+  padding: 14px 18px;
+}
+
+.profileField {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.profileField:last-child {
+  border-bottom: none;
+}
+
+.profileLabel {
+  font-weight: 600;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.profileValue {
+  font-weight: 700;
+  color: #1e293b;
+  font-size: 13px;
+}
+
+/* --- ВЫБОР ЦВЕТА АВАТАРКИ --- */
+.profileAvatarColors {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.avatarColorsLabel {
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.avatarColorsList {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.avatarColorOption {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.avatarColorOption:hover {
+  transform: scale(1.15);
+}
+
+.avatarColorOption.active {
+  border-color: #1e293b;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.8);
+  transform: scale(1.1);
 }

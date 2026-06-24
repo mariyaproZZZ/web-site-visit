@@ -123,6 +123,7 @@ const FooterTooltip: React.FC<{ text: string; children: React.ReactNode }> = ({ 
 export const MainStudent: React.FC = () => {
   const navigate = useNavigate();
   const user = getUser();
+  const studentId = user?.id || '0';
 
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
@@ -135,8 +136,9 @@ export const MainStudent: React.FC = () => {
     return savedColor && avatarColors.includes(savedColor) ? savedColor : avatarColors[0];
   });
 
+  // --- ПОРТФОЛИО С ПРИВЯЗКОЙ К СТУДЕНТУ ---
   const [uploadedFiles, setUploadedFiles] = useState<PortfolioFile[]>(() => {
-    const saved = localStorage.getItem('portfolioFiles');
+    const saved = localStorage.getItem(`portfolioFiles_${studentId}`);
     return saved ? JSON.parse(saved) : [];
   });
 
@@ -160,7 +162,7 @@ export const MainStudent: React.FC = () => {
   const [toastType, setToastType] = useState<'success' | 'error' | 'info'>('success');
   const [toastTimeout, setToastTimeout] = useState<number | null>(null);
   
-  // Храним ID опросов, по которым уже было отправлено уведомление (НЕЗАВИСИМО ОТ СТАТУСА)
+  // Храним ID опросов, по которым уже было отправлено уведомление
   const [notifiedPollIds, setNotifiedPollIds] = useState<Set<string>>(new Set());
 
   // Таймер для обновления опросов и уведомлений КАЖДЫЕ 5 СЕКУНД
@@ -179,6 +181,11 @@ export const MainStudent: React.FC = () => {
   useEffect(() => {
     fetchAllData();
   }, []);
+
+  // --- СОХРАНЕНИЕ ПОРТФОЛИО ПРИ ИЗМЕНЕНИИ ---
+  useEffect(() => {
+    localStorage.setItem(`portfolioFiles_${studentId}`, JSON.stringify(uploadedFiles));
+  }, [uploadedFiles, studentId]);
 
   const fetchAllData = async () => {
     try {
@@ -205,14 +212,14 @@ export const MainStudent: React.FC = () => {
       // --- ЛОГИКА УВЕДОМЛЕНИЙ О НОВЫХ ОПРОСАХ ---
       const activePolls = Array.isArray(pollsData) ? pollsData.filter((p: Poll) => p.active) : [];
       const today = new Date().toISOString().split('T')[0];
-      const studentId = parseInt(user?.id || '0');
+      const studentIdNum = parseInt(user?.id || '0');
       
       // Проверяем каждый активный опрос
       activePolls.forEach((poll: Poll) => {
         // Проверяем, отметился ли студент на этот опрос сегодня
         const isMarked = attendanceData.some(
           (a: AttendanceRecord) => 
-            a.studentId === studentId && 
+            a.studentId === studentIdNum && 
             a.disciplineId === poll.disciplineId && 
             a.date === today
         );
@@ -224,7 +231,7 @@ export const MainStudent: React.FC = () => {
           // Показываем тост
           showToastNotification(`Новый опрос по "${disciplineName}"!`, 'info');
           
-          // Добавляем уведомление в список (ТОЛЬКО ОДИН РАЗ)
+          // Добавляем уведомление в список
           const newNotification: Notification = {
             id: `poll_${poll.id}`,
             title: 'Новый опрос по посещаемости',
@@ -236,13 +243,11 @@ export const MainStudent: React.FC = () => {
           };
           
           setNotifications(prev => {
-            // Проверяем, нет ли уже такого уведомления
             const exists = prev.some(n => n.id === `poll_${poll.id}`);
             if (exists) return prev;
             return [newNotification, ...prev];
           });
           
-          // Добавляем ID опроса в список уведомленных
           setNotifiedPollIds(prev => new Set(prev).add(poll.id));
         }
       });
@@ -252,7 +257,6 @@ export const MainStudent: React.FC = () => {
     }
   };
 
-  // Вспомогательная функция для получения названия дисциплины из списка
   const getDisciplineNameFromList = (id: number, disciplinesList: Discipline[]): string => {
     const disc = disciplinesList.find((d: Discipline) => d.id === id);
     if (disc) return disc.name;
@@ -333,10 +337,10 @@ export const MainStudent: React.FC = () => {
       endDate = new Date(now.getFullYear(), now.getMonth() + attendanceOffset + 1, 0);
     }
     
-    const studentId = parseInt(user?.id || '0');
+    const studentIdNum = parseInt(user?.id || '0');
     return attendance.filter(record => {
       const recordDate = new Date(record.date);
-      return record.studentId === studentId && recordDate >= startDate && recordDate <= endDate;
+      return record.studentId === studentIdNum && recordDate >= startDate && recordDate <= endDate;
     });
   };
 
@@ -393,7 +397,7 @@ export const MainStudent: React.FC = () => {
         if (processed === files.length) {
           const updatedFiles = [...uploadedFiles, ...newFiles];
           setUploadedFiles(updatedFiles);
-          localStorage.setItem('portfolioFiles', JSON.stringify(updatedFiles));
+          // Сохраняем автоматически через useEffect
           setIsUploading(false);
           showToastNotification('Файлы успешно загружены!', 'success');
         }
@@ -412,7 +416,6 @@ export const MainStudent: React.FC = () => {
   const removeFile = (index: number) => {
     const updatedFiles = uploadedFiles.filter((_, i) => i !== index);
     setUploadedFiles(updatedFiles);
-    localStorage.setItem('portfolioFiles', JSON.stringify(updatedFiles));
     showToastNotification('Файл удален', 'info');
   };
 
@@ -510,7 +513,6 @@ export const MainStudent: React.FC = () => {
     return diffDays + ' дней назад';
   };
 
-  // Функция для отметки уведомления как прочитанного
   const markAsRead = (id: string) => {
     setNotifications(prev =>
       prev.map(n => n.id === id ? { ...n, read: true } : n)
@@ -784,7 +786,7 @@ export const MainStudent: React.FC = () => {
         </div>
       </footer>
 
-      {/* Модалка: Уведомления - обновлена как у преподавателя */}
+      {/* Модалка: Уведомления */}
       <Modal isOpen={showNotifications} onClose={() => setShowNotifications(false)} title="Уведомления">
         <div className={styles.notificationsList}>
           {notifications.length === 0 ? (

@@ -668,6 +668,13 @@
       "date": "2026-06-24",
       "status": "П",
       "id": "EX59MLj7pcE"
+    },
+    {
+      "studentId": 2,
+      "disciplineId": "1",
+      "date": "2026-06-24",
+      "status": "П",
+      "id": "EYchWt5xOr0"
     }
   ],
   "polls": [
@@ -690,6 +697,26 @@
       "active": false,
       "disciplineName": "Высшая математика",
       "id": "d9P-cbQqrRY"
+    },
+    {
+      "disciplineId": "1",
+      "teacherId": 1,
+      "groupId": 1,
+      "startedAt": "2026-06-24T16:52:59.372Z",
+      "expiresAt": "2026-06-24T17:07:59.372Z",
+      "active": false,
+      "disciplineName": "Высшая математика",
+      "id": "1z7vi_JiKdA"
+    },
+    {
+      "disciplineId": "1",
+      "teacherId": 1,
+      "groupId": 1,
+      "startedAt": "2026-06-24T16:53:34.950Z",
+      "expiresAt": "2026-06-24T17:08:34.950Z",
+      "active": false,
+      "disciplineName": "Высшая математика",
+      "id": "ZfsfTtb3Vqo"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

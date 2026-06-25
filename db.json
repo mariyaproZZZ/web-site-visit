@@ -675,6 +675,118 @@
       "date": "2026-06-24",
       "status": "П",
       "id": "EYchWt5xOr0"
+    },
+    {
+      "studentId": 1,
+      "disciplineId": "1",
+      "date": "2026-06-25",
+      "status": "П",
+      "id": "08sMllNO_qc"
+    },
+    {
+      "studentId": 1,
+      "disciplineId": 2,
+      "date": "2026-06-25",
+      "status": "П",
+      "id": "dZudhN0Lx5k"
+    },
+    {
+      "studentId": 2,
+      "disciplineId": 2,
+      "date": "2026-06-25",
+      "status": "Н",
+      "id": "Drgdv2slaqo"
+    },
+    {
+      "studentId": 3,
+      "disciplineId": 2,
+      "date": "2026-06-25",
+      "status": "Н",
+      "id": "ehPa_1rYugU"
+    },
+    {
+      "studentId": 4,
+      "disciplineId": 2,
+      "date": "2026-06-25",
+      "status": "Н",
+      "id": "iSrfztgKTdo"
+    },
+    {
+      "studentId": 5,
+      "disciplineId": 2,
+      "date": "2026-06-25",
+      "status": "Н",
+      "id": "Du0f8YdYf1o"
+    },
+    {
+      "studentId": 6,
+      "disciplineId": 2,
+      "date": "2026-06-25",
+      "status": "Н",
+      "id": "78Woqd8TQMI"
+    },
+    {
+      "studentId": 7,
+      "disciplineId": 2,
+      "date": "2026-06-25",
+      "status": "Н",
+      "id": "hpm_8G7nlZw"
+    },
+    {
+      "studentId": 8,
+      "disciplineId": 2,
+      "date": "2026-06-25",
+      "status": "Н",
+      "id": "Lo3eBK5mr0k"
+    },
+    {
+      "studentId": 9,
+      "disciplineId": 2,
+      "date": "2026-06-25",
+      "status": "Н",
+      "id": "DdGxcTgXNjk"
+    },
+    {
+      "studentId": 10,
+      "disciplineId": 2,
+      "date": "2026-06-25",
+      "status": "Н",
+      "id": "z6oauiyJyC4"
+    },
+    {
+      "studentId": 11,
+      "disciplineId": 2,
+      "date": "2026-06-25",
+      "status": "Н",
+      "id": "l2ZELMGuafo"
+    },
+    {
+      "studentId": 12,
+      "disciplineId": 2,
+      "date": "2026-06-25",
+      "status": "Н",
+      "id": "EYlQ3FISj8g"
+    },
+    {
+      "studentId": 13,
+      "disciplineId": 2,
+      "date": "2026-06-25",
+      "status": "Н",
+      "id": "X2nhV_eCec0"
+    },
+    {
+      "studentId": 14,
+      "disciplineId": 2,
+      "date": "2026-06-25",
+      "status": "Н",
+      "id": "ZKZpgxkhSo4"
+    },
+    {
+      "studentId": 15,
+      "disciplineId": 2,
+      "date": "2026-06-25",
+      "status": "Н",
+      "id": "ctMx50bEALs"
     }
   ],
   "polls": [
@@ -717,6 +829,56 @@
       "active": false,
       "disciplineName": "Высшая математика",
       "id": "ZfsfTtb3Vqo"
+    },
+    {
+      "disciplineId": "1",
+      "teacherId": 1,
+      "groupId": 1,
+      "startedAt": "2026-06-25T05:08:00.805Z",
+      "expiresAt": "2026-06-25T05:18:00.805Z",
+      "active": false,
+      "disciplineName": "Высшая математика",
+      "id": "gRuxK1K_BRc"
+    },
+    {
+      "disciplineId": "1",
+      "teacherId": 1,
+      "groupId": 1,
+      "startedAt": "2026-06-25T05:25:47.765Z",
+      "expiresAt": "2026-06-25T05:40:47.765Z",
+      "active": false,
+      "disciplineName": "Высшая математика",
+      "id": "so46PO8CMw0"
+    },
+    {
+      "disciplineId": 2,
+      "teacherId": 1,
+      "groupId": 1,
+      "startedAt": "2026-06-25T05:34:50.995Z",
+      "expiresAt": "2026-06-25T05:49:50.995Z",
+      "active": false,
+      "disciplineName": "Неизвестно",
+      "id": "0tKKalhfwpA"
+    },
+    {
+      "disciplineId": "1",
+      "teacherId": 1,
+      "groupId": 1,
+      "startedAt": "2026-06-25T06:26:00.239Z",
+      "expiresAt": "2026-06-25T06:41:00.239Z",
+      "active": false,
+      "disciplineName": "Высшая математика",
+      "id": "3rkQ1aSqJbo"
+    },
+    {
+      "disciplineId": "1",
+      "teacherId": 1,
+      "groupId": 1,
+      "startedAt": "2026-06-25T06:33:56.119Z",
+      "expiresAt": "2026-06-25T06:48:56.119Z",
+      "active": false,
+      "disciplineName": "Высшая математика",
+      "id": "Cvw5BfovHiQ"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"

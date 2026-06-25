@@ -83,7 +83,22 @@ const FALLBACK_DISCIPLINES: Record<number, string> = {
   2: 'Программирование',
   3: 'Физика',
   4: 'Английский язык',
-  5: 'Базы данных'
+  5: 'Базы данных',
+  6: 'Компьютерные сети',
+  7: 'Операционные системы',
+  8: 'Веб-разработка',
+  9: 'Математический анализ',
+  10: 'Теория вероятностей',
+  11: 'Дискретная математика',
+  12: 'Информационная безопасность',
+  13: 'Криптография',
+  14: 'Искусственный интеллект',
+  15: 'Философия',
+  16: 'История',
+  17: 'Социология',
+  18: 'Психология',
+  19: 'Логика',
+  20: 'Этика'
 };
 
 // --- КОМПОНЕНТ ПОДСКАЗКИ ДЛЯ ФУТЕРА ---
@@ -124,6 +139,7 @@ export const MainStudent: React.FC = () => {
   const navigate = useNavigate();
   const user = getUser();
   const studentId = user?.id || '0';
+  const studentGroupId = user?.groupId; // Получаем ID группы студента
 
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
@@ -198,15 +214,19 @@ export const MainStudent: React.FC = () => {
       ]);
       
       const pollsData = await pollsRes.json();
-      const notificationsData = await notificationsRes.json();
+      // const notificationsData = await notificationsRes.json(); // Убрано - не используется
       const attendanceData = await attendanceRes.json();
       const scheduleData = await scheduleRes.json();
       const disciplinesData = await disciplinesRes.json();
       
-      // Обновляем данные
+      // ФИЛЬТРУЕМ расписание по группе студента
+      const filteredSchedule = Array.isArray(scheduleData) 
+        ? scheduleData.filter((item: ScheduleItem) => item.groupId === studentGroupId)
+        : [];
+      
       setPolls(Array.isArray(pollsData) ? pollsData : []);
       setAttendance(Array.isArray(attendanceData) ? attendanceData : []);
-      setSchedule(Array.isArray(scheduleData) ? scheduleData : []);
+      setSchedule(filteredSchedule);
       setDisciplines(Array.isArray(disciplinesData) ? disciplinesData : []);
       
       // --- ЛОГИКА УВЕДОМЛЕНИЙ О НОВЫХ ОПРОСАХ ---
@@ -292,6 +312,7 @@ export const MainStudent: React.FC = () => {
     return FALLBACK_DISCIPLINES[id] || 'Неизвестно';
   };
 
+  // ИСПРАВЛЕННАЯ ФУНКЦИЯ - фильтруем по группе студента
   const getScheduleForWeek = (weekStart: Date) => {
     const start = new Date(weekStart);
     const end = new Date(start);
@@ -301,6 +322,9 @@ export const MainStudent: React.FC = () => {
     
     schedule
       .filter(item => {
+        // Проверяем, что запись принадлежит группе студента
+        if (item.groupId !== studentGroupId) return false;
+        
         const dayOffset = item.dayOfWeek - 1;
         const itemDate = new Date(start);
         itemDate.setDate(itemDate.getDate() + dayOffset);
@@ -397,7 +421,6 @@ export const MainStudent: React.FC = () => {
         if (processed === files.length) {
           const updatedFiles = [...uploadedFiles, ...newFiles];
           setUploadedFiles(updatedFiles);
-          // Сохраняем автоматически через useEffect
           setIsUploading(false);
           showToastNotification('Файлы успешно загружены!', 'success');
         }
@@ -470,11 +493,12 @@ export const MainStudent: React.FC = () => {
 
   const weekDays = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'];
 
-  const scheduleData = [
-    { time: '09:00-10:30', subject: 'Высшая математика', type: 'Лекция', room: 'Ауд. 402' },
-    { time: '10:45-12:15', subject: 'Программирование', type: 'Практика', room: 'Ауд. 205' },
-    { time: '12:45-14:15', subject: 'Физика', type: 'Лекция', room: 'Ауд. 301' },
-  ];
+  // ВЫЧИСЛЯЕМ scheduleMap ДО ИСПОЛЬЗОВАНИЯ
+  const scheduleMap = getScheduleForWeek(currentWeekStart);
+  
+  // Данные для расписания на сегодня
+  const today = new Date().getDay();
+  const todaySchedule = scheduleMap.get(today === 0 ? 6 : today) || [];
 
   const activePolls = polls.filter(p => {
     if (!p.active) return false;
@@ -484,7 +508,6 @@ export const MainStudent: React.FC = () => {
   });
   
   const attendanceRecords = getAttendanceForPeriod();
-  const scheduleMap = getScheduleForWeek(currentWeekStart);
   
   // Количество непрочитанных уведомлений
   const unreadCount = notifications.filter(n => !n.read).length;
@@ -631,14 +654,22 @@ export const MainStudent: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {scheduleData.map((item, index) => (
-                  <tr key={index}>
-                    <td>{item.time}</td>
-                    <td>{item.subject}</td>
-                    <td>{item.type}</td>
-                    <td>{item.room}</td>
+                {todaySchedule.length > 0 ? (
+                  todaySchedule.map((item, index) => (
+                    <tr key={index}>
+                      <td>{item.time}</td>
+                      <td>{getDisciplineName(item.disciplineId)}</td>
+                      <td>{item.type}</td>
+                      <td>{item.room}</td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={4} style={{ textAlign: 'center', padding: '20px', color: '#94a3b8' }}>
+                      На сегодня занятий нет
+                    </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
           </div>

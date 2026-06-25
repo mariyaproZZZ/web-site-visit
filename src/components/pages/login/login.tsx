@@ -111,7 +111,7 @@ export const Login: React.FC = () => {
           )}
 
           <form onSubmit={handleSubmit} style={{ width: '100%' }}>
-            {/* --- ПОЛЕ ЛОГИНА (без глаза) --- */}
+            {/* --- ПОЛЕ ЛОГИНА --- */}
             <div className={styles.inputGroup}>
               <label className={styles.inputLabel}>Логин</label>
               <input
@@ -123,7 +123,7 @@ export const Login: React.FC = () => {
               />
             </div>
 
-            {/* --- ПОЛЕ ПАРОЛЯ (с глазом) --- */}
+            {/* --- ПОЛЕ ПАРОЛЯ (с одним глазом) --- */}
             <div className={styles.inputGroup}>
               <label className={styles.inputLabel}>Пароль</label>
               <div className={styles.passwordWrapper}>
@@ -152,10 +152,9 @@ export const Login: React.FC = () => {
                     </svg>
                   )}
                 </button>
-                
-                <div className={`${styles.passwordHint} ${showHint ? styles.visible : ''}`}>
-                  Пароль должен содержать не менее 8 символов.
-                </div>
+              </div>
+              <div className={`${styles.passwordHint} ${showHint ? styles.visible : ''}`}>
+                Пароль должен содержать не менее 8 символов.
               </div>
             </div>
 
@@ -175,7 +174,7 @@ export const Login: React.FC = () => {
 
         <Footer links={footerLinks} />
 
-        {/* --- ПОПАП С АНИМАЦИЕЙ --- */}
+        {/* --- ПОПАП --- */}
         {activeModal && (
           <div 
             style={{

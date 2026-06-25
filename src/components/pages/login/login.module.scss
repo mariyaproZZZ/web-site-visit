@@ -564,3 +564,16 @@
     font-size: 11px;
   }
 }
+
+// В конце login.module.scss добавьте, чтобы скрыть возможные псевдоэлементы
+.authInput::-ms-reveal,
+.authInput::-webkit-reveal {
+  display: none !important;
+}
+
+.passwordWrapper .authInput {
+  &::-ms-reveal,
+  &::-webkit-reveal {
+    display: none !important;
+  }
+}
